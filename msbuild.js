@@ -16,6 +16,8 @@ THE SOFTWARE.
 
 */
 
+var colors = require('colors');
+
 var msbuild = function(){
 
 	this.config = {
@@ -75,15 +77,13 @@ msbuild.prototype.exec = function (cmd) {
 
         ls = childProcess.exec(cmd, function (error, stdout, stderr) {
             if (error) {
-                console.log(error.stack);
-                console.log('Error code: ' + error.code);
-                console.log('Signal received: ' + error.signal);
+                console.log(error.stack.redBG);
+				var errorMessage = 'Error code: ' + error.code;
+				var errorMessageSignal = error.signal;
+                console.log(errorMessage.red);
+                console.log(errorMessageSignal.grey);
             }
-            console.log('Child Process STDOUT: ' + stdout);
-        });
-
-        ls.on('exit', function (code) {
-            console.log('Child process exited with exit code ' + code);
+            console.log('RESULT: ' + stdout.grey);
         });
     }
 
@@ -103,21 +103,6 @@ msbuild.prototype.build = function(){
 	this.exec('cd ' + this.config.solutionPath + ' & ' + this.buildexe() + ' ' + this.config.solutionName + '.sln' + ' /P:DeployOnBuild=false /P:PublishProfile=' + this.config.publishProfile + ' /P:Configuration='+this.config.configuration);
 }
 
-msbuild.prototype.packageByProj = function(){
-	var packageParameters = '';
-	packageParameters = packageParameters.concat(' /p:DeployOnBuild=false ');
-	packageParameters = packageParameters.concat(' /t:Package '); 
-	packageParameters = packageParameters.concat(' /p:OutputPath='+this.config.packageOutputPath+' '); 
-	packageParameters = packageParameters.concat(' /p:PublishProfile=' + this.config.publishProfile + ' ');
-	packageParameters = packageParameters.concat(' /p:Configuration='+this.config.configuration+' ');
-	packageParameters = packageParameters.concat(' /tv:4.0 ');
-	
-	var build_cmd = 'cd ' + this.config.projectPath + ' & ' + this.buildexe() + ' ';
-	var source = this.config.projectName + '.csproj ';
-	var runthis = build_cmd.concat(source,packageParameters);
-	this.exec(runthis);
-}
-
 msbuild.prototype.package = function(){
 	var packageParameters = '';
 	packageParameters = packageParameters.concat(' /p:DeployOnBuild=false ');
@@ -130,15 +115,6 @@ msbuild.prototype.package = function(){
 	var build_cmd = 'cd ' + this.config.projectPath + ' & ' + this.buildexe() + ' ';
 	var source = this.config.projectName + '.csproj ';
 	var runthis = build_cmd.concat(source,packageParameters);
-	this.exec(runthis);
-}
-
-msbuild.prototype.publishPackage = function(_parameters){
-	var path = this.config.packageOutputPath+'\\_PublishedWebsites\\'+this.config.projectName+'_Package';
-	var cmdPath = path +'\\'+this.config.projectName+'.deploy.cmd';
-	console.log(cmdPath);
-	var build_cmd = 'cd ' + path + ' & ' + cmdPath + ' ';
-	var runthis = build_cmd.concat(_parameters);
 	this.exec(runthis);
 }
 
@@ -163,6 +139,29 @@ msbuild.prototype.test = function(){
 	var runthis = build_cmd.concat(source,publishParameters);
 	console.log(runthis);
 }
+
+
+
+/****  help section ****/
+function printHelp(o){
+	var helpFunctionsToIgnore = ['exec','path','buildexe'];
+	console.log("\nfunctions".cyan.bold);
+	console.log('*******************'.cyan);
+	
+	for(var p in o){
+		if(typeof(o[p]) == 'function'){
+			if(helpFunctionsToIgnore.indexOf(p) > -1) continue;
+			if(p == 'printOptions') continue;
+			if(p == '?') continue;
+			console.log(p.redBG);
+		}
+	}
+}
+
+var args = [];
+for(var arg in process.argv) { args.push(process.argv[arg]); }
+var help = args.splice(2,1);
+if(help == '?') { 	printHelp( new msbuild()); } 
 
 
 module.exports = new msbuild();
