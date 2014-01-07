@@ -1,0 +1,19 @@
+{
+  "author": "jonathan haker",
+  "name": "msbuild",
+  "description": "msbuild helpers for .net apps",
+  "version": "0.0.2",
+  "repository": {
+    "url": ""
+  },
+  "main": "msbuild.js",
+  "dependencies": {},
+  "devDependencies": {
+        "should": ">= 2.0.x",
+        "mocha": "~1.14.0"
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
