@@ -3,12 +3,11 @@ msbuild.js
 
 about
 --------
-node.js msbuild wrapper
+basic msbuild operations for node.js
 
 
 
 getting started
 ----------
 see examples
-	exmples/publishExample1
-	exmples/publishExample2
+	
