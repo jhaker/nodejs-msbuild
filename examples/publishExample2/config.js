@@ -1,10 +1,13 @@
 
 function config(_configuration){
+	this.os						='windows';
+	this.processor 			='x86';
+	this.version				= '4.0';
 	this.solutionName 		= 'mock';
 	this.solutionPath 		= process.cwd() + '/mockFiles/';
 	this.projectName 		= 'mock';
 	this.projectPath 		= process.cwd() + '/mockFiles/mockSolution/mockProject/';
-	this.targetFramework 	= 'v4.0';
+	this.targetFramework 	= '4.0';
 	this.publishProfile		= '';
 	this.configuration 		= _configuration;
 }

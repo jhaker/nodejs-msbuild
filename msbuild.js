@@ -28,6 +28,7 @@ var msbuild = function(){
 	var defaultPath = process.cwd();
 	
 	this.config = {
+		os : 'windows',
 		processor : 'x86',
 		version: '4.0',
 		solutionName : '',
@@ -78,7 +79,7 @@ var msbuild = function(){
 	}
 	
 	this.buildexe = function(){
-		return MSBuildPath('windows',this.config.processor,this.config.version)
+		return this.MSBuildPath(this.config.os,this.config.processor,this.config.version)
 	};
 
 };
@@ -100,12 +101,15 @@ msbuild.prototype.exec = function (cmd) {
     }
 
 msbuild.prototype.setConfig = function(cg){
+		this.config.os = 							cg.os;
+		this.config.processor =				cg.processor;
+		this.config.version =					cg.version;
 		this.config.solutionName = 		cg.solutionName;
-		this.config.solutionPath = 		cg.solutionPath;
-		this.config.projectName = 		cg.projectName;
-		this.config.projectPath = 		cg.projectPath;
-		this.config.configuration = 	cg.configuration;
-		this.config.publishProfile =	cg.publishProfile;
+		this.config.solutionPath = 			cg.solutionPath;
+		this.config.projectName = 			cg.projectName;
+		this.config.projectPath = 			cg.projectPath;
+		this.config.configuration = 			cg.configuration;
+		this.config.publishProfile =			cg.publishProfile;
 		this.config.targetFramework = 	cg.targetFramework;
 		this.config.deployParameters = 	cg.deployParamters;
 		this.config.packageOutputPath = cg.packageOutputPath();
