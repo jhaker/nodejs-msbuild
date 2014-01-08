@@ -16,73 +16,121 @@ THE SOFTWARE.
 
 */
 
-var colors = require('colors'),
-	path = require('path');
+//var colors = require('colors');
 
+
+
+var x = function(){};
+var _ = new x();
+_.isPlainObject = function(obj){
+  var ctor, key;
+  if (typeof obj != 'object' || !obj || toString.call(obj) != '[object Object]') {
+    return false;
+  }
+  ctor = typeof obj.constructor == 'function' && obj.constructor.prototype;
+  if (!ctor || !hasOwnProperty.call(ctor, 'isPrototypeOf')) {
+    return false;
+  }
+  for (key in obj) {}
+  return key === void 0 || hasOwnProperty.call(obj, key);
+};
+
+var validateCmdParameter = function(param){
+	param += "";
+	if (param.length <= 2)  return false;
+	if (param.substring(0, 1) !== "/")  return false;
+	if (param.indexOf(":")  < 1)  return false;
+	return true;
+}
+
+var defaultPath = process.cwd();
+
+var defaultValues = function(){
+		this.os 									= 'windows';  // currently only support windows
+		this.processor 						=	 'x86';  //   'x86', 'x64'
+		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
+		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
+		this.configuration 					= 'debug';   // solution configurations; targets an environment (debug,release)  
+		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
+		
+		//not implemented(use cmdParameters for /tv:)				
+		this.targetFramework 			= '';  //  '2.0','3.0','3.5','4.0','4.5'  (should match destination server's iis application pool )
+		
+		this.outputPath 						= '';  //  'c:/deploys/release'
+		this.cmdParameters		 		= [];  /***
+																		property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug']   
+																		target overrides  ['/tv:4.0']
+																***/
+}
 
 	
 var msbuild = function(){
-	
 
-	
-	var defaultPath = process.cwd();
-	
-	this.config = {
-		os : 'windows',
-		processor : 'x86',
-		version: '4.0',
-		solutionName : '',
-		solutionPath : defaultPath,
-		projectName : '',
-		projectPath : defaultPath,
-		configuration : 'Debug',
-		publishProfile : '',
-		targetFramework : '4.0',
-		deployParameters : '',
-		packageOutputPath : ''
-	};
-	
 	this.processors = {
-        'x86': 'Framework',
-        'x64': 'Framework64'
-    };
-	
-	
-	
-	
-    this.path = function (newPath) {
-        this.config.path = newPath;
-        process.chdir(this.config.path);
-        return this;
-    };
-	
-    this.frameworks = {
-        '1':'1.0.3705',
-        '1.0':'1.0.3705',
-        '1.1':'1.1.4322',
-        '2': '2.0.50727',
-        '2.0': '2.0.50727',
-        '3.5': '3.5',
-        '4.0': '4.0.30319',
+			'x86': 'Framework',
+			'x64': 'Framework64'
+		};
+		
+	this.toolsVersion = {
+		'2.0': '2.0.50727',  // can only target 2.0
+		'3.0':'3.0',
+		'3.5': '3.5',
+		'4.0': '4.0.30319', // can target 2.0, 3.0, 3.5 and 4
 		'4.5': '4.0.30319'
-    };
-	
-	this.targetFrameworks = ['v2.0','v3.0','v3.5','v4.0','v4.5','v4.5.1'];
+	};
+
+	this.targetFrameworks = ['2.0','3.0','3.5','4.0','4.5'];
 
 	this.MSBuildPath = function(os,processor,framework){
 		if(os === 'linux') return;
 		
 		var windir = process.env.WINDIR;
 		var frameworkprocessorDirectory = processor === 'x64' ? 'framework64' : 'framework';
-		var frameworkDirectory = 'v' + this.frameworks[framework];
+		var frameworkDirectory = 'v' + this.toolsVersion[framework];
 		return (windir + '\\Microsoft.NET\\' + frameworkprocessorDirectory + '\\' + frameworkDirectory + '\\msbuild.exe').toLowerCase();
 	}
 	
 	this.buildexe = function(){
-		return this.MSBuildPath(this.config.os,this.config.processor,this.config.version)
+		return this.MSBuildPath(this.os,this.processor,this.version)
 	};
-
 };
+
+msbuild.prototype = new defaultValues();
+
+msbuild.prototype.config =  function(name, value) {
+			var map;
+			if (_.isPlainObject(name)) {
+				map = name;
+			} 
+			else if (value !== undefined) {
+				this[name] = value;
+				return this;
+			} else if (name === undefined) {
+				return this.values;
+			} else {
+				return this[name];
+			}
+
+			for (var key in map) {
+					this.values[name] = map[key];
+			}
+
+			return this;
+};
+
+msbuild.prototype.setConfig = function(cg){
+
+		this.os = 								cg.os 										|| this.os;
+		this.processor =					cg.processor 						|| this.processor;
+		this.version =						  	cg.version 								|| this.version;
+		this.sourcePath = 					cg.sourcePath 						|| this.sourcePath;
+		this.configuration = 			  	cg.configuration 					|| this.configuration;  
+		this.publishProfile =			  	cg.publishProfile 					|| this.publishProfile;
+		this.targetFramework = 		cg.targetFramework 			|| this.targetFramework;
+		this.cmdParameters = 	  		cg.cmdParameters 				|| this.cmdParameters;
+		this.outputPath  =  				cg.outputPath 						|| this.outputPath;
+	
+}
 
 msbuild.prototype.exec = function (cmd) {
         var childProcess = require('child_process'),
@@ -90,70 +138,90 @@ msbuild.prototype.exec = function (cmd) {
 
         ls = childProcess.exec(cmd, function (error, stdout, stderr) {
             if (error) {
-                console.log(error.stack.redBG);
+                //console.log(error.stack.redBG);
+				console.log(error.stack);
 				var errorMessage = 'Error code: ' + error.code;
-				var errorMessageSignal = error.signal;
-                console.log(errorMessage.red);
-                console.log(errorMessageSignal.grey);
+				//console.log(errorMessage.red);
+				console.log(errorMessage);
             }
-            console.log('RESULT: ' + stdout.grey);
+            //console.log('RESULT: ' + stdout.grey);
+			console.log('RESULT: ' + stdout);
         });
     }
 
-msbuild.prototype.setConfig = function(cg){
-		this.config.os = 							cg.os;
-		this.config.processor =				cg.processor;
-		this.config.version =					cg.version;
-		this.config.solutionName = 		cg.solutionName;
-		this.config.solutionPath = 			cg.solutionPath;
-		this.config.projectName = 			cg.projectName;
-		this.config.projectPath = 			cg.projectPath;
-		this.config.configuration = 			cg.configuration;
-		this.config.publishProfile =			cg.publishProfile;
-		this.config.targetFramework = 	cg.targetFramework;
-		this.config.deployParameters = 	cg.deployParamters;
-		this.config.packageOutputPath = cg.packageOutputPath();
+msbuild.prototype.loadCmdParameters = function(params){
+		var parameters = '';
+		if(!params){
+			parameters = parameters.concat(params);
+		}
+		
+		for(var param in this.cmdParameters){
+			if(!validateCmdParameter(param)) continue;
+			parameters = parameters.concat(' ' + param + ' ');
+		}
+		return parameters;
 }
 
+msbuild.prototype.loadPackageParameters = function(params){
+		var parameters = '';
+		if(!params){
+			parameters = parameters.concat(params);
+		}
+		
+		if(parameters.indexOf('deployonbuild') === -1){
+				parameters = parameters.concat(' /p:deployonbuild=false ');
+		}
+		if(parameters.indexOf('package') === -1){
+			parameters = parameters.concat(' /t:package '); 
+		}
+		if(parameters.indexOf('outputpath') === -1){
+			parameters = parameters.concat(' /p:outputpath='+this.outputPath+' '); 
+		}
+		if(parameters.indexOf('publishprofile') === -1){
+			parameters = parameters.concat(' /p:publishprofile=' + this.publishProfile + ' ');
+		}
+		if(parameters.indexOf('configuration') === -1){
+			parameters = parameters.concat(' /p:configuration='+this.configuration+' ');
+		}
+		return parameters;
+}
+
+msbuild.prototype.loadPublishParameters = function(params){
+		var parameters = '';
+		if(!params){
+			parameters = parameters.concat(params);
+		}
+		
+		if(parameters.indexOf('deployonbuild') === -1){
+				parameters = parameters.concat(' /p:deployonbuild=true ');
+		}
+		if(parameters.indexOf('publishprofile') === -1){
+			parameters = parameters.concat(' /p:publishprofile=' + this.publishProfile + ' ');
+		}
+		if(parameters.indexOf('configuration') === -1){
+			parameters = parameters.concat(' /p:configuration='+this.configuration+' ');
+		}
+		return parameters;
+}
+	
 msbuild.prototype.build = function(){
-	this.exec('cd ' + this.config.solutionPath + ' & ' + this.buildexe() + ' ' + this.config.solutionName + '.sln' + ' /P:DeployOnBuild=false /P:PublishProfile=' + this.config.publishProfile + ' /P:Configuration='+this.config.configuration);
+	this.exec(this.buildexe() + '  ' + this.sourcePath + ' /P:DeployOnBuild=false /P:PublishProfile=' + this.publishProfile + ' /P:Configuration='+this.configuration);
 }
 
 msbuild.prototype.package = function(){
-	var packageParameters = '';
-	packageParameters = packageParameters.concat(' /p:DeployOnBuild=false ');
-	packageParameters = packageParameters.concat(' /t:Package '); 
-	packageParameters = packageParameters.concat(' /p:OutputPath='+this.config.packageOutputPath+' '); 
-	packageParameters = packageParameters.concat(' /p:PublishProfile=' + this.config.publishProfile + ' ');
-	packageParameters = packageParameters.concat(' /p:Configuration='+this.config.configuration+' ');
-	packageParameters = packageParameters.concat(' /tv:4.0 ');
-	
-	var build_cmd = 'cd ' + this.config.projectPath + ' & ' + this.buildexe() + ' ';
-	var source = this.config.projectName + '.csproj ';
-	var runthis = build_cmd.concat(source,packageParameters);
-	this.exec(runthis);
+	var parameters = '';
+	parameters = this.loadCmdParameters(parameters);
+	parameters = this.loadPackageParameters(parameters);
+	var cmd = this.buildexe().concat(' ',this.sourcePath,' ',parameters);
+	this.exec(cmd);
 }
 
 msbuild.prototype.publish = function(){
-	var publishParameters = '';
-	publishParameters = publishParameters.concat(' /p:DeployOnBuild=true ');
-	publishParameters = publishParameters.concat(' /P:Configuration='+this.config.configuration+' ');
-	publishParameters = publishParameters.concat(' /p:PublishProfile=' + this.config.publishProfile + ' ');
-	var build_cmd = 'cd ' + this.config.solutionPath + ' & ' + this.buildexe() + ' ';
-	var source = this.config.solutionName + '.sln ';
-	var runthis = build_cmd.concat(source,publishParameters);
-	this.exec(runthis);
-}
-
-msbuild.prototype.test = function(){
-	var publishParameters = '';
-	publishParameters = publishParameters.concat(' /p:DeployOnBuild=true ');
-	publishParameters = publishParameters.concat(' /P:Configuration='+this.config.configuration+' ');
-	publishParameters = publishParameters.concat(' /p:PublishProfile=' + this.config.publishProfile + ' ');
-	var build_cmd = 'cd ' + this.config.solutionPath + ' & ' + this.buildexe() + ' ';
-	var source = this.config.solutionName + '.sln ';
-	var runthis = build_cmd.concat(source,publishParameters);
-	console.log(runthis);
+	var parameters = this.loadCmdParameters();
+	parameters = this.loadPublishParameters(parameters);
+	var buildpath = this.buildexe();
+	var cmd = buildpath.concat(' ',this.sourcePath,' ',parameters);
+	this.exec(cmd);
 }
 
 

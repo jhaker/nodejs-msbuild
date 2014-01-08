@@ -2,7 +2,7 @@
   "author": "jonathan haker",
   "name": "msbuild",
   "description": "msbuild helpers for .net apps",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/jhaker/nodejs-msbuild.git"
