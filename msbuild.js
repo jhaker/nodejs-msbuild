@@ -16,17 +16,24 @@ THE SOFTWARE.
 
 */
 
-var colors = require('colors');
+var colors = require('colors'),
+	path = require('path');
 
+
+	
 var msbuild = function(){
+	
 
+	
+	var defaultPath = process.cwd();
+	
 	this.config = {
 		processor : 'x86',
-		version: 'v4.0.30319',
+		version: '4.0',
 		solutionName : '',
-		solutionPath : process.cwd(),
+		solutionPath : defaultPath,
 		projectName : '',
-		projectPath : process.cwd(),
+		projectPath : defaultPath,
 		configuration : 'Debug',
 		publishProfile : '',
 		targetFramework : '4.0',
@@ -39,7 +46,8 @@ var msbuild = function(){
         'x64': 'Framework64'
     };
 	
-	this.buildexe = function(){return ' %systemroot%/Microsoft.NET/'+this.processors[this.config.processor]+'/'+this.config.version+'/msbuild.exe';};
+	
+	
 	
     this.path = function (newPath) {
         this.config.path = newPath;
@@ -47,7 +55,7 @@ var msbuild = function(){
         return this;
     };
 	
-    this.versions = {
+    this.frameworks = {
         '1':'1.0.3705',
         '1.0':'1.0.3705',
         '1.1':'1.1.4322',
@@ -55,19 +63,23 @@ var msbuild = function(){
         '2.0': '2.0.50727',
         '3.5': '3.5',
         '4.0': '4.0.30319',
-        'net1.0': '1.0.3705',
-        'net10': '1.0.3705',
-        'net1.1': '1.1.4322',
-        'net11': '1.1.4322',
-        'net2.0': '2.0.50727',
-        'net20': '2.0.50727',
-        'net3.5': '3.5',
-        'net35': '3.5',
-        'net4.0': '4.0.30319',
-        'net40': '4.0.30319'
+		'4.5': '4.0.30319'
     };
 	
 	this.targetFrameworks = ['v2.0','v3.0','v3.5','v4.0','v4.5','v4.5.1'];
+
+	this.MSBuildPath = function(os,processor,framework){
+		if(os === 'linux') return;
+		
+		var windir = process.env.WINDIR;
+		var frameworkprocessorDirectory = processor === 'x64' ? 'framework64' : 'framework';
+		var frameworkDirectory = 'v' + this.frameworks[framework];
+		return (windir + '\\Microsoft.NET\\' + frameworkprocessorDirectory + '\\' + frameworkDirectory + '\\msbuild.exe').toLowerCase();
+	}
+	
+	this.buildexe = function(){
+		return MSBuildPath('windows',this.config.processor,this.config.version)
+	};
 
 };
 
