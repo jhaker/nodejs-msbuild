@@ -53,11 +53,11 @@ var defaultValues = function(){
 		this.configuration 					= 'debug';   // solution configurations; targets an environment (debug,release)  
 		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
 		
-		//not implemented(use cmdParameters for /tv:)				
+		//not implemented(use overrideParams for /tv:)				
 		this.targetFramework 			= '';  //  '2.0','3.0','3.5','4.0','4.5'  (should match destination server's iis application pool )
 		
 		this.outputPath 						= '';  //  'c:/deploys/release'
-		this.cmdParameters		 		= [];  /***
+		this.overrideParams		 		= [];  /***
 																		property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug']   
 																		target overrides  ['/tv:4.0']
 																***/
@@ -65,6 +65,7 @@ var defaultValues = function(){
 
 	
 var msbuild = function(){
+	
 
 	this.processors = {
 			'x86': 'Framework',
@@ -127,7 +128,7 @@ msbuild.prototype.setConfig = function(cg){
 		this.configuration = 			  	cg.configuration 					|| this.configuration;  
 		this.publishProfile =			  	cg.publishProfile 					|| this.publishProfile;
 		this.targetFramework = 		cg.targetFramework 			|| this.targetFramework;
-		this.cmdParameters = 	  		cg.cmdParameters 				|| this.cmdParameters;
+		this.overrideParams = 	  		cg.overrideParams 				|| this.overrideParams;
 		this.outputPath  =  				cg.outputPath 						|| this.outputPath;
 	
 }
@@ -148,79 +149,101 @@ msbuild.prototype.exec = function (cmd) {
 			console.log('RESULT: ' + stdout);
         });
     }
+	
+msbuild.prototype.getDeployOnBuildParam = function(shouldDeploy){
+		if(!shouldDeploy){
+			shouldDeploy = false;
+		}
+		return ' /p:deployonbuild='.concat(shouldDeploy);
+}
 
-msbuild.prototype.loadCmdParameters = function(params){
-		var parameters = '';
+msbuild.prototype.getBuildParams = function(params){
 		if(!params){
-			parameters = parameters.concat(params);
+			params = '';
+		}
+		params += "";
+		
+		if(params.indexOf('configuration') === -1 && this.configuration){
+			params += (' /p:configuration='+this.configuration+' ');
+		}
+		if(params.indexOf('publishprofile') === -1 && this.publishProfile){
+			params += (' /p:publishprofile=' + this.publishProfile + ' ');
 		}
 		
-		for(var param in this.cmdParameters){
+		return params;
+}
+
+msbuild.prototype.getPackageParams = function(params){
+		if(!params){
+			params = '';
+		}
+		params += "";
+		
+		console.log(params.cyanBG);
+		if(params.indexOf('deployonbuild') === -1){
+				var deployOnBuildParam = this.getDeployOnBuildParam(false);
+				params += deployOnBuildParam;
+		}
+		if(params.indexOf('package') === -1){
+			params += (' /t:package '); 
+		}
+		if(params.indexOf('outputpath') === -1 && this.outputPath){
+			params += (' /p:outputpath='+this.outputPath+' '); 
+		}
+		return params;
+}
+
+msbuild.prototype.getPublishParams = function(params){
+		if(!params){
+			params = '';
+		}
+		params += "";
+		
+		if(params.indexOf('deployonbuild') === -1){
+				var deployOnBuildParam = this.getDeployOnBuildParam(true);
+				params += (deployOnBuildParam);
+		}
+		return params;
+}
+
+msbuild.prototype.getOverrideParams = function(params){
+		if(!params){
+			params = '';
+		}
+		params += "";
+		
+		for(var param in this.overrideParams){
 			if(!validateCmdParameter(param)) continue;
-			parameters = parameters.concat(' ' + param + ' ');
+			params += (' ' + param + ' ');
 		}
-		return parameters;
-}
-
-msbuild.prototype.loadPackageParameters = function(params){
-		var parameters = '';
-		if(!params){
-			parameters = parameters.concat(params);
-		}
-		
-		if(parameters.indexOf('deployonbuild') === -1){
-				parameters = parameters.concat(' /p:deployonbuild=false ');
-		}
-		if(parameters.indexOf('package') === -1){
-			parameters = parameters.concat(' /t:package '); 
-		}
-		if(parameters.indexOf('outputpath') === -1){
-			parameters = parameters.concat(' /p:outputpath='+this.outputPath+' '); 
-		}
-		if(parameters.indexOf('publishprofile') === -1){
-			parameters = parameters.concat(' /p:publishprofile=' + this.publishProfile + ' ');
-		}
-		if(parameters.indexOf('configuration') === -1){
-			parameters = parameters.concat(' /p:configuration='+this.configuration+' ');
-		}
-		return parameters;
-}
-
-msbuild.prototype.loadPublishParameters = function(params){
-		var parameters = '';
-		if(!params){
-			parameters = parameters.concat(params);
-		}
-		
-		if(parameters.indexOf('deployonbuild') === -1){
-				parameters = parameters.concat(' /p:deployonbuild=true ');
-		}
-		if(parameters.indexOf('publishprofile') === -1){
-			parameters = parameters.concat(' /p:publishprofile=' + this.publishProfile + ' ');
-		}
-		if(parameters.indexOf('configuration') === -1){
-			parameters = parameters.concat(' /p:configuration='+this.configuration+' ');
-		}
-		return parameters;
+		return params;
 }
 	
 msbuild.prototype.build = function(){
-	this.exec(this.buildexe() + '  ' + this.sourcePath + ' /P:DeployOnBuild=false /P:PublishProfile=' + this.publishProfile + ' /P:Configuration='+this.configuration);
+	var params = this.getDeployOnBuildParam(false);
+		 params = this.getBuildParams(params);
+	
+	var buildpath = this.buildexe();
+	var cmd = buildpath.concat(' ',this.sourcePath,' ',params);
+	this.exec(cmd);
 }
 
 msbuild.prototype.package = function(){
-	var parameters = '';
-	parameters = this.loadCmdParameters(parameters);
-	parameters = this.loadPackageParameters(parameters);
-	var cmd = this.buildexe().concat(' ',this.sourcePath,' ',parameters);
+	var params = this.getBuildParams();
+		 params = this.getOverrideParams(params);
+		 params = this.getPackageParams(params);
+	
+	var cmd = this.buildexe().concat(' ',this.sourcePath,' ',params);
 	this.exec(cmd);
 }
 
 msbuild.prototype.publish = function(){
-	var parameters = this.loadCmdParameters();
-	parameters = this.loadPublishParameters(parameters);
+	var params = this.getBuildParams();
+		 params = this.getOverrideParams();
+		 params = this.getPublishParams();
+	
 	var buildpath = this.buildexe();
-	var cmd = buildpath.concat(' ',this.sourcePath,' ',parameters);
+	var cmd = buildpath.concat(' ',this.sourcePath,' ',params);
 	this.exec(cmd);
 }
 
