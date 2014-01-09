@@ -212,10 +212,10 @@ msbuild.prototype.getOverrideParams = function(params){
 		}
 		params += "";
 		
-		for(var param in this.overrideParams){
-			if(!validateCmdParameter(param)) continue;
-			params += (' ' + param + ' ');
-		}
+		this.overrideParams.forEach(function (param) {
+		    if (!validateCmdParameter(param)) return;
+		    params += (' ' + param + ' ');
+		});
 		return params;
 }
 	
