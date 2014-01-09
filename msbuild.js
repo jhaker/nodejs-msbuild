@@ -239,8 +239,8 @@ msbuild.prototype.package = function(){
 
 msbuild.prototype.publish = function(){
 	var params = this.getBuildParams();
-		 params = this.getOverrideParams();
-		 params = this.getPublishParams();
+		 params = this.getOverrideParams(params);
+		 params = this.getPublishParams(params);
 	
 	var buildpath = this.buildexe();
 	var cmd = buildpath.concat(' ',this.sourcePath,' ',params);
