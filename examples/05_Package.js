@@ -15,11 +15,9 @@ var msbuild = require('../msbuild');
 
 
 
-/*  configure  */
-	// min configuration required
-	msbuild.config('configuration','myconfiguration');
-	msbuild.config('publishProfile','mypublishprofile');
 
+msbuild.config('configuration','myconfiguration');
+msbuild.config('publishProfile','mypublishprofile');
+msbuild.config('outputPath','c:/mypackages/mypackagename');
 
-// call publish as the last step
-msbuild.publish(); 
+msbuild.package();

@@ -51,21 +51,16 @@ var defaultValues = function(){
 		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
 		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
 		this.configuration 					= 'myconfiguration';   // solution configurations; targets an environment (debug,release)  
-		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
-		
-		//not implemented(use overrideParams for /tv:)				
-		this.targetFramework 			= '';  //  '2.0','3.0','3.5','4.0','4.5'  (should match destination server's iis application pool )
-		
+		this.publishProfile 					= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
 		this.outputPath 						= '';  //  'c:/deploys/release'
 		this.overrideParams		 		= [];  /***
-																		property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug']   
-																		target overrides  ['/tv:4.0']
+																		property overrides (example: ['/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
+																		target framework overrides (example:  ['/tv:4.0'] )
 																***/
 }
 
 	
 var msbuild = function(){
-	
 
 	this.processors = {
 			'x86': 'Framework',
@@ -79,44 +74,50 @@ var msbuild = function(){
 		'4.0': '4.0.30319', // can target 2.0, 3.0, 3.5 and 4
 		'4.5': '4.0.30319'
 	};
-
-	this.targetFrameworks = ['2.0','3.0','3.5','4.0','4.5'];
-
-	this.MSBuildPath = function(os,processor,framework){
-		if(os === 'linux') return;
-		
-		var windir = process.env.WINDIR;
-		var frameworkprocessorDirectory = processor === 'x64' ? 'framework64' : 'framework';
-		var frameworkDirectory = 'v' + this.toolsVersion[framework];
-		return (windir + '\\Microsoft.NET\\' + frameworkprocessorDirectory + '\\' + frameworkDirectory + '\\msbuild.exe').toLowerCase();
-	}
 	
-	this.buildexe = function(){
-		return this.MSBuildPath(this.os,this.processor,this.version)
-	};
 };
 
 msbuild.prototype = new defaultValues();
 
+msbuild.prototype.getMSBuildPath = function(os,processor,framework){
+	if(os === 'linux') return;
+	
+	var windir = process.env.WINDIR;
+	var frameworkprocessorDirectory = processor === 'x64' ? 'framework64' : 'framework';
+	var frameworkDirectory = 'v' + this.toolsVersion[framework];
+	return (windir + '\\Microsoft.NET\\' + frameworkprocessorDirectory + '\\' + frameworkDirectory + '\\msbuild.exe').toLowerCase();
+}
+
+msbuild.prototype.buildexe = function(){
+	return this.getMSBuildPath(this.os,this.processor,this.version)
+}
+
 msbuild.prototype.config =  function(name, value) {
-			var map;
-			if (_.isPlainObject(name)) {
-				map = name;
-			} 
-			else if (value !== undefined) {
-				this[name] = value;
-				return this;
-			} else if (name === undefined) {
-				return this.values;
-			} else {
-				return this[name];
-			}
 
-			for (var key in map) {
-					this.values[name] = map[key];
-			}
+	if(name.toLowerCase() === 'targetframework') 
+	{
+		console.log('\n * CONFIG WARNING: \''.concat(name,'\'  has been deprecated\n   Please use overrideParams (example: overrideParams = [\'/tv:4.0\'] )\n'));
+		return;
+	}
+	
+	var map;
+	if (_.isPlainObject(name)) {
+		map = name;
+	} 
+	else if (value !== undefined) {
+		this[name] = value;
+		return this;
+	} else if (name === undefined) {
+		return this.values;
+	} else {
+		return this[name];
+	}
 
-			return this;
+	for (var key in map) {
+			this.values[name] = map[key];
+	}
+
+	return this;
 };
 
 msbuild.prototype.setConfig = function(cg){
@@ -127,7 +128,6 @@ msbuild.prototype.setConfig = function(cg){
 		this.sourcePath = 					cg.sourcePath 						|| this.sourcePath;
 		this.configuration = 			  	cg.configuration 					|| this.configuration;  
 		this.publishProfile =			  	cg.publishProfile 					|| this.publishProfile;
-		this.targetFramework = 		cg.targetFramework 			|| this.targetFramework;
 		this.overrideParams = 	  		cg.overrideParams 				|| this.overrideParams;
 		this.outputPath  =  				cg.outputPath 						|| this.outputPath;
 	
