@@ -16,7 +16,9 @@ view git project for more examples
 simple example
 ---
 var msbuild = require('msbuild');
+
 msbuild.config('configuration','myconfiguration');
+
 msbuild.config('publishProfile','mypublishProfile');
 
 msbuild.exec  = function(cmd){
