@@ -17,10 +17,8 @@ msbuild.exec  = function(cmd){
 /*  configure */
 console.log('\n\n');
 console.log('*  OPTION 1- add configuration settings by name *');
-msbuild.config('configuration','prd_release_configuration');
-msbuild.config('publishProfile','server_01_publishProfile');
-msbuild.config('configuration','prd_release_configuration');
-msbuild.config('publishProfile','server_01_publishProfile');
+msbuild.config('configuration','myconfiguration');
+msbuild.config('publishProfile','mypublishprofile');
 msbuild.config('processor','x86');
 msbuild.config('version','2.0');
 msbuild.publish();
@@ -34,8 +32,8 @@ var config_option_2 = function(){
 		this.processor 						=	 'x64';  //   'x86', 'x64'
 		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
 		this.sourcePath 					=  'c:/mypath/mysolution.sln'
-		this.configuration 					= 'ppe_release';   // solution configurations; targets an environment (debug,release)  
-		this.publishProfile 				= 'webserver01';   //publish profiles; targets a specific machine (webserver01,webserver02)
+		this.configuration 					= 'myconfiguration';   // solution configurations; targets an environment (debug,release)  
+		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (webserver01,webserver02)
 		//not implemented(use cmdParameters for now)				
 		//this.targetFramework 			= '';  //  '2.0','3.0','3.5','4.0','4.5'  (should match destination server's iis application pool )
 		

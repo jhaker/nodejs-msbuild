@@ -50,7 +50,7 @@ var defaultValues = function(){
 		this.processor 						=	 'x86';  //   'x86', 'x64'
 		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
 		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
-		this.configuration 					= 'debug';   // solution configurations; targets an environment (debug,release)  
+		this.configuration 					= 'myconfiguration';   // solution configurations; targets an environment (debug,release)  
 		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
 		
 		//not implemented(use overrideParams for /tv:)				
