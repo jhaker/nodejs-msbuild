@@ -65,15 +65,9 @@ outputPath
 	
 overrideParams
 
-	/***
-																		property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug']   
-																		target overrides  ['/tv:4.0']
-																***/
-
-
-
-
-
+	property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug']   
+	
+	target overrides  ['/tv:4.0']
 
 
 	
