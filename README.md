@@ -37,6 +37,7 @@ msbuild.config('configuration','myconfiguration');
 msbuild.config('publishProfile','mypublishProfile');
 
 // override the exec function to output cmd 
+
 msbuild.exec  = function(cmd){
 	
 	console.log('\nTEST 1: Preview MSBUILD Command');
