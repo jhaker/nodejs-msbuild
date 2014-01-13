@@ -13,7 +13,9 @@ view git project for more examples
 
 
 
-simple example
+
+
+example - publish
 ---
 var msbuild = require('msbuild');
 
@@ -21,6 +23,20 @@ msbuild.config('configuration','myconfiguration');
 
 msbuild.config('publishProfile','mypublishProfile');
 
+msbuild.publish();
+
+
+
+
+example - how to override exec to preview cmd arguments
+---
+var msbuild = require('msbuild');
+
+msbuild.config('configuration','myconfiguration');
+
+msbuild.config('publishProfile','mypublishProfile');
+
+// override the exec function to output cmd 
 msbuild.exec  = function(cmd){
 	
 	console.log('\nTEST 1: Preview MSBUILD Command');
@@ -30,6 +46,7 @@ msbuild.exec  = function(cmd){
 }
 
 msbuild.publish();
+
 
 
 
