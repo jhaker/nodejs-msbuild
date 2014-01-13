@@ -26,6 +26,7 @@ msbuild.exec  = function(cmd){
 	console.log(cmd);
 	console.log('********** test - end  ************\n');
 }
+
 msbuild.publish();
 
 
