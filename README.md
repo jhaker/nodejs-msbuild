@@ -14,13 +14,13 @@ msbuild.publishProfile='mypublishProfile';
 msbuild.build();
 ```
 
-### example - publish w/ console logging verbose
+### example - publish w/ verbose logging
 ```
 var msbuild = require('msbuild');
 msbuild.configuration = 'myconfiguration';
 msbuild.publishProfile='mypublishProfile';
 this.overrideParams = [];
-this.overrideParams.push('/clp:ErrorsOnly');  
+this.overrideParams.push('/clp:verbosity=normal');  
 msbuild.publish();
 ```
 
