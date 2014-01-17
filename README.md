@@ -18,7 +18,7 @@ msbuild.build();
 ```
 var msbuild = require('msbuild');
 msbuild.configuration = 'myconfiguration';
-msbuild.publishProfile='mypublishProfile';
+msbuild.publishProfile = 'mypublishProfile';
 this.overrideParams = [];
 this.overrideParams.push('/clp:verbosity=normal');  
 msbuild.publish();
@@ -28,7 +28,7 @@ msbuild.publish();
 ```
 var msbuild = require('msbuild');
 msbuild.configuration = 'myconfiguration';
-msbuild.publishProfile='mypublishProfile';
+msbuild.publishProfile = 'mypublishProfile';
 // override the exec function to output cmd 
 msbuild.exec  = function(cmd){
 	console.log('\nTEST 1: Preview MSBUILD Command');
