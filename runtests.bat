@@ -1,7 +1,7 @@
 @ECHO OFF
 
 TITLE MSBUILDTests
-goto FRAMEWORKTESTS
+rem goto FRAMEWORKTESTS
 goto PARAMTESTS
 goto end
 

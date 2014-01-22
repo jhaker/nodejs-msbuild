@@ -1,6 +1,5 @@
 
 var mocha = require('mocha'),
-	colors = require('colors'),
 	should = require('should'),
 	fs = require('fs'),
 	msbuild = require('../msbuild');
@@ -10,101 +9,46 @@ var mocha = require('mocha'),
 	msbuild.outputPath = 'c:/mydeploys';
 	msbuild.configuration = 'myconfiguration';
 	msbuild.publishProfile = 'mypublishprofile';
+	msbuild.verbose = false;
 	
-	/* uncomment to test empty overrides */
-	//msbuild.outputPath = '';
-	//msbuild.configuration = '';
-	//msbuild.publishProfile = '';
-	
-	msbuild.exec  = function(cmd){
-	
-	console.log('\nTEST 1: Preview MSBUILD Command');
-	console.log('********** test - start ************');
-	randomLog(cmd);
-	console.log('********** test - end  ************\n');
-	}
+	/*  prevent actual publish or deploy during test; override final exe function; return the final cmd */
+	msbuild.exec  = function(cmd){ return cmd; }
 	/******  END SETUP    ******/
 	
 	
-
-var randomLogIndex = 0;	
-	
-var randomLog = function(msg){
-	if(randomLogIndex === 0){
-		randomLogIndex = 1;
-		console.log(msg.red.cyanBG);
-	}
-	if(randomLogIndex === 1){
-		randomLogIndex = 0;
-		console.log(msg.redBG);
-	}
-}
-
-var ahr = '*********************************************';
-var br = '\n';
-var cyan = 'cyan';
-var red = 'red';
-var grey = 'grey';
-function logTitle(msg,color){
-	
-	msg = ' '.concat(msg);
-	msg = br.concat(br,ahr,br,' test - ',msg,br,ahr);
-	log(msg,color);
-}
-
-function log(msg,color){
-	if(color === 'red') {
-		console.log(msg.red);
-		return;
-	}
-	if(color === 'cyan') {
-		console.log(msg.cyan);
-		return;
-	}
-	if(color === 'grey') {
-		console.log(msg.grey);
-		return;
-	}
-	console.log(msg);
-}
-
-
-
-
-
 describe('msbuild',function(){
-	
-		describe('MSBUILD.msbuildtest',function(){
-				logTitle('deploy params',cyan);
-				log(msbuild.getDeployOnBuildParam(),red);
-				log(msbuild.getDeployOnBuildParam(false),grey);
-				log(msbuild.getDeployOnBuildParam(true),grey);
+
+		describe('build params',function(){
+				msbuild.getBuildParams(false).should.equal(' /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile ');
 		})
 		
-		describe('MSBUILD.msbuildtest',function(){
-				logTitle('build params',cyan);
-				log(msbuild.getBuildParams(false),grey);
-		})
-		
-		describe('MSBUILD.msbuildtest',function(){
-				logTitle('package params',cyan);
-				log(msbuild.getPackageParams(false),grey);
-		})
-		
-		describe('MSBUILD.msbuildtest',function(){
-				logTitle('build params',cyan);
-				log(msbuild.getBuildParams(false),grey);
+		describe('package params',function(){
+				msbuild.getPackageParams(false).should.equal(' /p:deployonbuild=false /t:package  /p:outputpath=c:/mydeploys ');
 		})
 
-		describe('MSBUILD.msbuildtest',function(){
-				logTitle('publish params',cyan);
-				log(msbuild.getPublishParams(false),grey);
+		describe('publish params',function(){
+				msbuild.getPublishParams(false).should.equal(' /p:deployonbuild=true');
+		})
+				
+		describe('deploy params',function(){
+				msbuild.getDeployOnBuildParam().should.equal(' /p:deployonbuild=false');
+				msbuild.getDeployOnBuildParam(false).should.equal(' /p:deployonbuild=false');
+				msbuild.getDeployOnBuildParam(true).should.equal(' /p:deployonbuild=true');
 		})
 		
-		describe('build package publish',function(){
-				msbuild.build();
-				msbuild.package();
-				msbuild.publish();
+		describe('build cmd',function(){
+			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe C:\\_sandbox\\nodejs-msbuild  /p:deployonbuild=false /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile ';
+			msbuild.build().should.equal(expected);
+		})
+		
+		describe('package cmd',function(){
+			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe C:\\_sandbox\\nodejs-msbuild  /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile  /p:deployonbuild=false /t:package  /p:outputpath=c:/mydeploys ';
+			msbuild.package().should.equal(expected);
+		})
+		
+		describe('publish cmd',function(){
+			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe C:\\_sandbox\\nodejs-msbuild  /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile  /p:deployonbuild=true';
+			msbuild.publish().should.equal(expected);
 		})
 		
 

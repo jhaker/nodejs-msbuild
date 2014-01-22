@@ -52,15 +52,16 @@ var defaultPath = process.cwd();
 var defaultValues = function(){
 		this.os 									= 'windows';  // currently only support windows
 		this.processor 						=	 'x86';  //   'x86', 'x64'
-		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
+		this.version								= '4.0';  //  tools version; determines local path to msbuild.exe
 		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
 		this.configuration 					= 'myconfiguration';   // solution configurations; targets an environment (debug,release)  
-		this.publishProfile 					= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
+		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
 		this.outputPath 						= '';  //  'c:/deploys/release'
-		this.overrideParams		 		= ['/clp:ErrorsOnly;'];  /***
-																		property overrides (example: ['/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
+		this.overrideParams		 		= []; /***
+																		property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
 																		target framework overrides (example:  ['/tv:4.0'] )
 																***/
+		this.verbose							= true;
 }
 
 var msbuild = function(){
@@ -170,7 +171,6 @@ msbuild.prototype.getPackageParams = function(params){
 		}
 		params += "";
 		
-		console.log(params.cyanBG);
 		if(params.indexOf('deployonbuild') === -1){
 				var deployOnBuildParam = this.getDeployOnBuildParam(false);
 				params += deployOnBuildParam;
@@ -216,7 +216,7 @@ msbuild.prototype.build = function(){
 		 params = this.getBuildParams(params);
 	var buildpath = this.buildexe();
 	var cmd = buildpath.concat(' ',this.sourcePath,' ',params);
-	this.exec(cmd);
+	return this.exec(cmd);
 }
 
 msbuild.prototype.package = function(){
@@ -225,7 +225,7 @@ msbuild.prototype.package = function(){
 		 params = this.getOverrideParams(params);
 		 params = this.getPackageParams(params);
 	var cmd = this.buildexe().concat(' ',this.sourcePath,' ',params);
-	this.exec(cmd);
+	return this.exec(cmd);
 }
 
 msbuild.prototype.publish = function(){
@@ -235,8 +235,7 @@ msbuild.prototype.publish = function(){
 		 params = this.getPublishParams(params);
 	var buildpath = this.buildexe();
 	var cmd = buildpath.concat(' ',this.sourcePath,' ',params);
-	this.exec(cmd);
-	
+	return this.exec(cmd);
 }
 
 /****  help section ****/
@@ -264,7 +263,7 @@ msbuild.prototype.printHelp = function(){
 
 
 var msb = new msbuild();
-msb.on('status',function(err,results){ if(this.showHelp) return; if(err){ console.log(err.redBG);}; console.log(results.cyan);});
+msb.on('status',function(err,results){ if(this.showHelp || !this.verbose) return; if(err){ console.log(err.redBG);}; console.log(results.cyan);});
 msb.on('error',function(err,results){ console.log('error'.red); if(err){ console.log(err.redBG);}; console.log(results.red);});
 msb.on('done',function(err,results){console.log(results);});
 module.exports = msb;

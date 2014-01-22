@@ -88,7 +88,7 @@ describe('msbuild',function(){
 				 for(var config in MSBuildConfigs){
 					 var name = MSBuildConfigs[config].name;
 					 var expected = MSBuildConfigs[config].expected;
-					 var result = msbuild.MSBuildPath(
+					 var result = msbuild.getMSBuildPath(
 												 MSBuildConfigs[config].os,
 												 MSBuildConfigs[config].processor,
 												 MSBuildConfigs[config].framework);
@@ -103,7 +103,7 @@ describe('msbuild',function(){
 		describe('LocalMSBuildPath',function(){			
 				for(var config in MSBuildConfigs){
 					var name = MSBuildConfigs[config].name;
-					var result = msbuild.MSBuildPath(
+					var result = msbuild.getMSBuildPath(
 												MSBuildConfigs[config].os,
 												MSBuildConfigs[config].processor,
 												MSBuildConfigs[config].framework);
