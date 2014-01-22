@@ -36,18 +36,19 @@ describe('msbuild',function(){
 				msbuild.getDeployOnBuildParam(true).should.equal(' /p:deployonbuild=true');
 		})
 		
+		var localPath = process.cwd();
 		describe('build cmd',function(){
-			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe C:\\_sandbox\\nodejs-msbuild  /p:deployonbuild=false /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile ';
+			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe '+localPath+'  /p:deployonbuild=false /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile ';
 			msbuild.build().should.equal(expected);
 		})
 		
 		describe('package cmd',function(){
-			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe C:\\_sandbox\\nodejs-msbuild  /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile  /p:deployonbuild=false /t:package  /p:outputpath=c:/mydeploys ';
+			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe '+localPath+'  /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile  /p:deployonbuild=false /t:package  /p:outputpath=c:/mydeploys ';
 			msbuild.package().should.equal(expected);
 		})
 		
 		describe('publish cmd',function(){
-			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe C:\\_sandbox\\nodejs-msbuild  /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile  /p:deployonbuild=true';
+			var expected = 'c:\\windows\\microsoft.net\\framework\\v4.0.30319\\msbuild.exe '+localPath+'  /p:configuration=myconfiguration  /p:publishprofile=mypublishprofile  /p:deployonbuild=true';
 			msbuild.publish().should.equal(expected);
 		})
 		
