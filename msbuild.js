@@ -5,7 +5,7 @@
  Licensed under the MIT license.
  https://github.com/jhaker/nodejs-msbuild
 
- */
+*/
 
 var events = require('events'),
 	async = require('async'),
@@ -42,8 +42,8 @@ var defaultPath = process.cwd();
 
 var defaultValues = function(){
 		this.os 									= 'windows';  // currently only support windows
-		this.processor 						=	 'x86';  //   'x86', 'x64'
-		this.version								= '4.0';  //  tools version; determines local path to msbuild.exe
+		this.processor 						=	'x86';  //   'x86', 'x64'
+		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
 		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
 		this.configuration 					= 'myconfiguration';   // solution configurations; targets an environment (debug,release)  
 		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
@@ -123,12 +123,12 @@ msbuild.prototype.exec = function (cmd) {
 	ls = childProcess.exec(cmd, function (error, stdout, stderr) {
 		var msg = '';
 		if (error) {
-			msg = ('\nstack...\n' + error.stack).grey+('\n publish failed - errors'.white.redBG);
+			msg = ('\nstack...\n' + error.stack).grey+('\n failed - errors'.white.redBG);
 			self.emit('error',error.code,msg);
 			return;
 		}
 		else{
-			msg = stdout.grey+('\n publish finished - no errors'.white.greenBG);
+			msg = stdout.grey+('\n finished - no errors'.white.greenBG);
 			self.emit('done',null,msg);
 		}
 	});
@@ -256,5 +256,11 @@ msbuild.prototype.printHelp = function(){
 var msb = new msbuild();
 msb.on('status',function(err,results){ if(this.showHelp || !this.verbose) return; if(err){ console.log(err.redBG);}; console.log(results.cyan);});
 msb.on('error',function(err,results){ console.log('error'.red); if(err){ console.log(err.redBG);}; console.log(results.red);});
-msb.on('done',function(err,results){console.log(results);});
+msb.on('done',function(err,results){ 
+	if(this.verbose) {
+		console.log(results);}
+		else{
+		console.log('done'.grey);
+		}
+	});
 module.exports = msb;
