@@ -39,6 +39,7 @@ var validateCmdParameter = function(param){
 }
 
 var defaultPath = process.cwd();
+var lineBreak = '\n- - - - - - - - - - - - - - - -';
 
 var defaultValues = function(){
 		this.os 									= 'windows';  // currently only support windows
@@ -128,7 +129,8 @@ msbuild.prototype.exec = function (cmd) {
 			return;
 		}
 		else{
-			msg = stdout.grey+('\n finished - no errors'.white.greenBG);
+			if(self.verbose){ msg = msg+(stdout.grey); }
+			msg = msg+('finished - no errors'.white.greenBG);
 			self.emit('done',null,msg);
 		}
 	});
@@ -200,9 +202,12 @@ msbuild.prototype.getOverrideParams = function(params){
 		});
 		return params;
 }
-	
+msbuild.prototype.emitStatusStart = function(action){
+	var startingMsg = (action+' starting').cyan;
+	this.emit('status',null,startingMsg);
+}	
 msbuild.prototype.build = function(){
-	this.emit('status',null,'build starting');
+	this.emitStatusStart('build');
 	var params = this.getDeployOnBuildParam(false);
 		 params = this.getBuildParams(params);
 	var buildpath = this.buildexe();
@@ -211,7 +216,7 @@ msbuild.prototype.build = function(){
 }
 
 msbuild.prototype.package = function(){
-	this.emit('status',null,'package starting');
+	this.emitStatusStart('package');
 	var params = this.getBuildParams();
 		 params = this.getOverrideParams(params);
 		 params = this.getPackageParams(params);
@@ -219,8 +224,9 @@ msbuild.prototype.package = function(){
 	return this.exec(cmd);
 }
 
+
 msbuild.prototype.publish = function(){
-	this.emit('status',null,'publish starting');
+	this.emitStatusStart('publish');
 	var params = this.getBuildParams();
 		 params = this.getOverrideParams(params);
 		 params = this.getPublishParams(params);
@@ -252,15 +258,20 @@ msbuild.prototype.printHelp = function(){
 	console.log('done'.redBG+' // msbuild.on(\'done\',myfunc)'.grey);
 }
 
-
-var msb = new msbuild();
-msb.on('status',function(err,results){ if(this.showHelp || !this.verbose) return; if(err){ console.log(err.redBG);}; console.log(results.cyan);});
-msb.on('error',function(err,results){ console.log('error'.red); if(err){ console.log(err.redBG);}; console.log(results.red);});
-msb.on('done',function(err,results){ 
-	if(this.verbose) {
-		console.log(results);}
-		else{
-		console.log('done'.grey);
+module.exports = function(callback){
+	var msb = new msbuild(callback);
+	msb.on('status',function(err,results){ 
+		if(this.showHelp) return; 
+		if(err){ console.log(err.redBG);}; 
+			console.log(results);}
+		);
+	msb.on('error',function(err,results){ console.log('error'.red); if(err){ console.log(err.redBG);}; console.log(results.red);});
+	msb.on('done',function(err,results){ 
+		console.log(results); 
+		console.log('done'.cyan);
+		console.log(lineBreak);
+		if(typeof callback == 'function') callback();
 		}
-	});
-module.exports = msb;
+	);
+	return msb;
+};
