@@ -8,27 +8,29 @@ view git project for more examples
 
 ### example - build
 ```
-var msbuild = require('msbuild');
-msbuild.configuration = 'myconfiguration';
-msbuild.publishProfile='mypublishProfile';
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(your_callback); 
+msbuild.configuration = 'your_app_configuration';
+msbuild.publishProfile='your_app_publish_profile';
 msbuild.build();
 ```
 
 ### example - publish w/ verbose logging
 ```
-var msbuild = require('msbuild');
-msbuild.configuration = 'myconfiguration';
-msbuild.publishProfile = 'mypublishProfile';
-this.overrideParams = [];
-this.overrideParams.push('/clp:verbosity=normal');  
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(your_callback);
+msbuild.configuration = 'your_app_configuration';
+msbuild.publishProfile='your_app_publish_profile';
+msbuild.verbose = true; 
 msbuild.publish();
 ```
 
 ### example - how to override exec to preview cmd arguments
 ```
-var msbuild = require('msbuild');
-msbuild.configuration = 'myconfiguration';
-msbuild.publishProfile = 'mypublishProfile';
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(your_callback);
+msbuild.configuration = 'your_app_configuration';
+msbuild.publishProfile='your_app_publish_profile';
 // override the exec function to output cmd 
 msbuild.exec  = function(cmd){
 	console.log('\nTEST 1: Preview MSBUILD Command');
