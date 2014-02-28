@@ -8,12 +8,12 @@ goto end
 
 :FRAMEWORKTESTS
 ECHO testing frameworks
-mocha tests/frameworktests.js
+mocha test/frameworktests.js
 exit /b
 
 :PARAMTESTS
 ECHO testing params
-mocha tests/paramtests.js
+mocha test/paramtests.js
 exit /b
 
 :end

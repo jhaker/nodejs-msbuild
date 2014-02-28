@@ -2,10 +2,11 @@
 var mocha = require('mocha'),
 	should = require('should'),
 	fs = require('fs'),
-	msbuild = require('../msbuild');
+	_msbuild = require('../msbuild');
 	
 	
 	/******  SETUP    ******/
+	var msbuild = new _msbuild(function(){});
 	msbuild.outputPath = 'c:/mydeploys';
 	msbuild.configuration = 'myconfiguration';
 	msbuild.publishProfile = 'mypublishprofile';

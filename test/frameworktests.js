@@ -3,8 +3,8 @@ var mocha = require('mocha'),
 	colors = require('colors'),
 	should = require('should'),
 	fs = require('fs'),
-	msbuild = require('../msbuild');
-	
+	_msbuild = require('../msbuild');
+	var msbuild = new _msbuild(function(){});
 	
 	/******  SETUP    ******/
 	msbuild.outputPath = 'c:/mydeploys';

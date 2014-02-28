@@ -1,4 +1,5 @@
-var msbuild = require('../msbuild');
+var _msbuild = require('../msbuild');
+var msbuild = new _msbuild(function(){});
 
 
 // TEST SETUP
@@ -13,13 +14,10 @@ var msbuild = require('../msbuild');
 	}
 /* end setup */
 
-
-
 /*  configure  */
 	// min configuration required
-	msbuild.configuration = 'myconfiguration';
-	msbuild.publishProfile = 'mypublishprofile';
-
+msbuild.configuration='myconfiguration';
+msbuild.publishProfile='mypublishprofile';
 
 // call publish as the last step
 msbuild.publish(); 

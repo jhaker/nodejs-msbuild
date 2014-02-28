@@ -1,4 +1,5 @@
-var msbuild = require('../msbuild');
+var _msbuild = require('../msbuild');
+var msbuild = new _msbuild(function(){});
 
 
 // TEST SETUP
@@ -12,8 +13,6 @@ var msbuild = require('../msbuild');
 		console.log('********** test - end  ************\n');
 	}
 /* end setup */
-
-
 
 /*  configure */
 	var config_option= function(){
@@ -29,9 +28,8 @@ var msbuild = require('../msbuild');
 																			target overrides  ['/tv:4.0']
 																	***/
 	}
-	msbuild.setConfig(new config_option());
-	
-	
-	
+
+msbuild.setConfig(new config_option());
+
 // call publish as the last step
 msbuild.publish();

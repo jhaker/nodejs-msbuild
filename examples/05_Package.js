@@ -1,4 +1,5 @@
-var msbuild = require('../msbuild');
+var _msbuild = require('../msbuild');
+var msbuild = new _msbuild(function(){});
 
 
 // TEST SETUP
@@ -13,11 +14,7 @@ var msbuild = require('../msbuild');
 	}
 /* end setup */
 
-
-
-
-msbuild.config('configuration','myconfiguration');
-msbuild.config('publishProfile','mypublishprofile');
-msbuild.config('outputPath','c:/mypackages/mypackagename');
-
+msbuild.configuration='myconfiguration';
+msbuild.publishProfile='mypublishprofile';
+msbuild.outputPath='c:/mypackages/mypackagename';
 msbuild.package();
