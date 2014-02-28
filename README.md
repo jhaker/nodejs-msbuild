@@ -10,6 +10,7 @@ view git project for more examples
 ```
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(your_callback); 
+msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
 msbuild.build();
@@ -19,6 +20,7 @@ msbuild.build();
 ```
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(your_callback);
+msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
 msbuild.verbose = true; 
@@ -29,6 +31,7 @@ msbuild.publish();
 ```
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(your_callback);
+msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
 // override the exec function to output cmd 
