@@ -9,7 +9,8 @@
 
 var events = require('events'),
 	async = require('async'),
-	colors = require('colors');
+	colors = require('colors'),
+	fs = require('fs');
 	
 var args = [];
 for(var arg in process.argv) { args.push(process.argv[arg]); }
@@ -116,6 +117,12 @@ msbuild.prototype.setConfig = function(cg){
 		this.outputPath  =  				cg.outputPath 						|| this.outputPath;
 }
 
+msbuild.prototype.abort = function (msg) {
+	var self = this;
+	self.emit('error','',msg);
+	return;
+}
+
 msbuild.prototype.exec = function (cmd) {
 	var self = this;
 	if(self.showHelp) { self.printHelp(); return; } //abort 
@@ -125,12 +132,13 @@ msbuild.prototype.exec = function (cmd) {
 		var msg = '';
 		if (error) {
 			msg = ('\nstack...\n' + error.stack).grey+('\n failed - errors'.white.redBG);
+			msg += '\n'+cmd;
 			self.emit('error',error.code,msg);
 			return;
 		}
 		else{
 			if(self.verbose){ msg = msg+(stdout.grey); }
-			msg = msg+('finished - no errors'.white.greenBG);
+			msg = msg+('  finished - no errors'.white.greenBG);
 			self.emit('done',null,msg);
 		}
 	});
@@ -202,17 +210,41 @@ msbuild.prototype.getOverrideParams = function(params){
 		});
 		return params;
 }
+
 msbuild.prototype.emitStatusStart = function(action){
-	var startingMsg = (action+' starting').cyan;
+	var startingMsg = ('  '+action+' starting').cyan;
 	this.emit('status',null,startingMsg);
 }	
+
+msbuild.prototype.setCmd = function(params){
+	var buildpath = this.buildexe();
+	if(!this.validateSourcePath()){
+		this.abort('aborting...bad source path');
+		return;
+	} 
+	else{
+		return buildpath.concat(' ',this.sourcePath,' ',params);
+	}
+}
+
+msbuild.prototype.validateSourcePath = function(){
+	if (fs.existsSync(this.sourcePath)) {
+		return true;
+	}
+	else{
+		console.log('  bad source path: '+this.sourcePath);
+		return false;
+	}
+}
+
 msbuild.prototype.build = function(){
 	this.emitStatusStart('build');
 	var params = this.getDeployOnBuildParam(false);
 		 params = this.getBuildParams(params);
-	var buildpath = this.buildexe();
-	var cmd = buildpath.concat(' ',this.sourcePath,' ',params);
-	return this.exec(cmd);
+	var cmd = this.setCmd(params);
+	if(cmd){
+		this.exec(cmd);
+	}
 }
 
 msbuild.prototype.package = function(){
@@ -220,19 +252,21 @@ msbuild.prototype.package = function(){
 	var params = this.getBuildParams();
 		 params = this.getOverrideParams(params);
 		 params = this.getPackageParams(params);
-	var cmd = this.buildexe().concat(' ',this.sourcePath,' ',params);
-	return this.exec(cmd);
+	var cmd = this.setCmd(params);
+	if(cmd){
+		this.exec(cmd);
+	}
 }
-
 
 msbuild.prototype.publish = function(){
 	this.emitStatusStart('publish');
 	var params = this.getBuildParams();
 		 params = this.getOverrideParams(params);
 		 params = this.getPublishParams(params);
-	var buildpath = this.buildexe();
-	var cmd = buildpath.concat(' ',this.sourcePath,' ',params);
-	return this.exec(cmd);
+	var cmd = this.setCmd(params);
+	if(cmd){
+		this.exec(cmd);
+	}
 }
 
 /****  help section ****/
@@ -260,15 +294,21 @@ msbuild.prototype.printHelp = function(){
 
 module.exports = function(callback){
 	var msb = new msbuild(callback);
-	msb.on('status',function(err,results){ 
+	msb.on('  status',function(err,results){ 
 		if(this.showHelp) return; 
 		if(err){ console.log(err.redBG);}; 
 			console.log(results);}
 		);
-	msb.on('error',function(err,results){ console.log('error'.red); if(err){ console.log(err.redBG);}; console.log(results.red);});
+	msb.on('error',
+		function(err,results){ 
+			console.log('  error'.red); 
+			if(err){ 
+				console.log(err.redBG);
+			}; 
+			console.log(results.red);
+			});
 	msb.on('done',function(err,results){ 
 		console.log(results); 
-		console.log('done'.cyan);
 		console.log(lineBreak);
 		if(typeof callback == 'function') callback();
 		}
