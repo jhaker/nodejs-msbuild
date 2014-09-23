@@ -12,6 +12,9 @@ var events = require('events'),
 	colors = require('colors'),
 	fs = require('fs');
 	
+var default_os = require('os').platform();
+if (default_os !== 'linux') default_os = "windows";
+
 var args = [];
 for(var arg in process.argv) { args.push(process.argv[arg]); }
 var help = args.splice(2,1);
@@ -43,7 +46,7 @@ var defaultPath = process.cwd();
 var lineBreak = '\n- - - - - - - - - - - - - - - -';
 
 var defaultValues = function(){
-		this.os 									= 'windows';  // currently only support windows
+		this.os 									= default_os;  // currently only support windows
 		this.processor 						=	'x86';  //   'x86', 'x64'
 		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
 		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
@@ -75,7 +78,7 @@ msbuild.prototype = new defaultValues();
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
 
 msbuild.prototype.getMSBuildPath = function(os,processor,framework){
-	if(os === 'linux') return;
+	if(os === 'linux') return "xbuild";
 	
 	var windir = process.env.WINDIR;
 	var frameworkprocessorDirectory = processor === 'x64' ? 'framework64' : 'framework';
