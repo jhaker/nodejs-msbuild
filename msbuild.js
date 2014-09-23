@@ -75,7 +75,7 @@ msbuild.prototype = new defaultValues();
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
 
 msbuild.prototype.getMSBuildPath = function(os,processor,framework){
-	if(os === 'linux') return;
+	if(os === 'linux') return "xbuild";
 	
 	var windir = process.env.WINDIR;
 	var frameworkprocessorDirectory = processor === 'x64' ? 'framework64' : 'framework';
