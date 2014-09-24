@@ -11,7 +11,7 @@ view git project for more examples
 ### example - build
 ```
 var _msbuild = require('msbuild');
-var msbuild = new _msbuild(your_callback); 
+var msbuild = new _msbuild(); 
 msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
@@ -21,7 +21,7 @@ msbuild.build();
 ### example - publish w/ verbose logging
 ```
 var _msbuild = require('msbuild');
-var msbuild = new _msbuild(your_callback);
+var msbuild = new _msbuild();
 msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
@@ -32,7 +32,7 @@ msbuild.publish();
 ### example - how to override exec to preview cmd arguments
 ```
 var _msbuild = require('msbuild');
-var msbuild = new _msbuild(your_callback);
+var msbuild = new _msbuild();
 msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
@@ -44,6 +44,19 @@ msbuild.exec  = function(cmd){
 	console.log('********** test - end  ************\n');
 }
 msbuild.publish();
+```
+
+### example - callback
+```
+var your_callback = function(){
+	console.log('msbuild done. move on...');
+}	
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(your_callback); 
+msbuild.sourcePath = 'c:/your_app.sln';
+msbuild.configuration = 'your_app_configuration';
+msbuild.publishProfile='your_app_publish_profile';
+msbuild.build();
 ```
 
 additional configuration parameters
