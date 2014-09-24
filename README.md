@@ -2,6 +2,8 @@
 
 basic msbuild operations (build,package,release) for node.js
 
+##linux support added in version: "0.2.1" (thanks to richorama)
+
 ## getting started
 view git project for more examples
 
