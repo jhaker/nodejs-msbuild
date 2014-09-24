@@ -68,10 +68,15 @@ additional configuration parameters
 - `publishProfile`  publish profile; targets a specific machine (app01,app02)
 - `outputPath`  package deploy path
 - `overrideParams`  property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug','/tv:4.0']  
-```
 
-ERRORS: `C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.Cpp.Platform.targets(64,5): error MSB8020: The build to
+
+
+
+####ISSUES/ERRORS
+ERROR: 
+`C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.Cpp.Platform.targets(64,5): error MSB8020: The build to
 ols for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found.`
 
-FIX: either include overrideParams(`--msvs_version=2012`) or update your csproj files
+FIX: 
+either include overrideParams(`--msvs_version=2012`) or update your csproj files
 	
