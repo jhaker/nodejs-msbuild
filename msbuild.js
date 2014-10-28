@@ -36,9 +36,8 @@ _.isPlainObject = function(obj){
 var validateCmdParameter = function(param){
 	param += "";
 	param = param.trim();
-	if (param.length <= 2)  return false;
+	if (param.length < 2)  return false;
 	if (param.substring(0, 1) !== "/")  return false;
-	if (param.indexOf(":")  < 1)  return false;
 	return true;
 }
 
@@ -50,8 +49,8 @@ var defaultValues = function(){
 		this.processor 						=	'x86';  //   'x86', 'x64'
 		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
 		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
-		this.configuration 					= 'myconfiguration';   // solution configurations; targets an environment (debug,release)  
-		this.publishProfile 				= 'mypublishprofile';   //publish profiles; targets a specific machine (app01,app02)
+		this.configuration 					= undefined;   // solution configurations; targets an environment (debug,release)  
+		this.publishProfile 				= undefined;   //publish profiles; targets a specific machine (app01,app02)
 		this.outputPath 						= '';  //  'c:/deploys/release'
 		this.overrideParams		 		= []; /***
 																		property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
@@ -208,7 +207,10 @@ msbuild.prototype.getOverrideParams = function(params){
 		params += "";
 		
 		this.overrideParams.forEach(function (param) {
-		    if (!validateCmdParameter(param)) return;
+		    if (!validateCmdParameter(param)) {
+				console.log('error: invalid parameter "'+param+'"');
+				return;
+			}
 		    params += (' ' + param + ' ');
 		});
 		return params;
