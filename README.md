@@ -71,7 +71,7 @@ additional configuration parameters
 
 
 ###Msbuild version "0.2.4" now available. 
-
+```
 Changes include: 
 1. overrideParams validation has been corrected to support single character parameters 
   Example: "/m"
@@ -79,7 +79,7 @@ Changes include:
 3. no longer requires "publishProfile"
 
 NOTE:  "sourcePath" is required if the "configuration" and "publishProfile" are not defined
-
+```
 
 
 ####ISSUES/ERRORS
