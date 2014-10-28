@@ -70,6 +70,16 @@ additional configuration parameters
 - `overrideParams`  property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug','/tv:4.0']  
 
 
+###Msbuild version "0.2.4" now available. 
+
+Changes include: 
+1. overrideParams validation has been corrected to support single character parameters 
+  Example: "/m"
+2. no longer requires "configuration" 
+3. no longer requires "publishProfile"
+
+NOTE:  "sourcePath" is required if the "configuration" and "publishProfile" are not defined
+
 
 
 ####ISSUES/ERRORS
