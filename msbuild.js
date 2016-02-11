@@ -45,24 +45,25 @@ var defaultPath = process.cwd();
 var lineBreak = '\n- - - - - - - - - - - - - - - -';
 
 var defaultValues = function(){
-		this.os 									= default_os;  // currently only support windows
-		this.processor 						=	'x86';  //   'x86', 'x64'
-		this.version							= '4.0';  //  tools version; determines local path to msbuild.exe
-		this.sourcePath 					= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
-		this.configuration 					= undefined;   // solution configurations; targets an environment (debug,release)  
-		this.publishProfile 				= undefined;   //publish profiles; targets a specific machine (app01,app02)
-		this.outputPath 						= '';  //  'c:/deploys/release'
-		this.overrideParams		 		= []; /***
-																		property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
-																		target framework overrides (example:  ['/tv:4.0'] )
-																***/
-		this.verbose							= true;
+		this.os 				= default_os;  // windows, linux
+		this.processor 			= 'x86';  //   'x86', 'x64'
+		this.version			= '4.0';  //  tools version; determines local path to msbuild.exe
+		this.sourcePath 		= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
+		this.configuration 		= undefined;   // solution configurations; targets an environment (debug,release)  
+		this.publishProfile 	= undefined;   //publish profiles; targets a specific machine (app01,app02)
+		this.outputPath 		= ''; 	//  'c:/deploys/release'
+		this.verbose 			= true;
+		/*** 
+		property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
+		target framework overrides (example:  ['/tv:4.0'] )
+		***/
+		this.overrideParams		= [];
 }
 
 var msbuild = function(){
 	events.EventEmitter.call(this);
 	this.showHelp = help == '?';
-	this.processors = { 	'x86': 'Framework', 'x64': 'Framework64'	};
+	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
 	this.toolsVersion = {
 		'2.0': '2.0.50727',  // can only target 2.0
 		'3.0':'3.0',
