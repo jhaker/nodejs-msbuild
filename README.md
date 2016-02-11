@@ -11,7 +11,7 @@ msbuild.publishProfile='Production_Environment';
 var overrideParams = [];
 	//VisualStudioVersion=14.0 => C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0
 	overrideParams.push('/p:VisualStudioVersion=14.0');
-	///tv:14.0 => overriding proj file targets
+	//tv:14.0 => overriding proj file targets
 	overrideParams.push('/tv:14.0');
 	overrideParams.push('/p:allowUntrustedCertificate=true');
 	overrideParams.push('/P:Password=myp@assword');
