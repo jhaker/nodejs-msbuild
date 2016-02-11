@@ -1,5 +1,26 @@
 # msbuild - msbuild.exe for node.js
 
+### VS 2015 example
+```
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(function(){});
+msbuild.sourcePath = 'C:/local/myapp.sln';
+msbuild.configuration='Release';
+msbuild.publishProfile='Production_Environment';
+
+var overrideParams = [];
+	//VisualStudioVersion=14.0 => C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0
+	overrideParams.push('/p:VisualStudioVersion=14.0');
+	///tv:14.0 => overriding proj file targets
+	overrideParams.push('/tv:14.0');
+	overrideParams.push('/p:allowUntrustedCertificate=true');
+	overrideParams.push('/P:Password=myp@assword');
+	
+msbuild.config('overrideParams',overrideParams);
+msbuild.publish(); 
+```
+
+
 basic msbuild operations (build,package,release) for node.js
 
 ##linux support added in version: "0.2.1" (thanks to richorama)
