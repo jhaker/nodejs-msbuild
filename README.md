@@ -1,11 +1,11 @@
 # msbuild
 msbuild.exe for node.js
 
-clean, build, package, release using publish profiles and/or params
+clean, build, package, release using publish profiles and params
 
 
 # example
-build
+Build.
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
