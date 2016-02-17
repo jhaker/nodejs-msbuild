@@ -1,5 +1,8 @@
 # msbuild
-### msbuild.exe for node.js
+msbuild.exe for node.js
+
+basic msbuild operations (build,package,release) for node.js
+
 
 # example - build
 ``` js
@@ -41,10 +44,6 @@ msbuild.publish();
 ```
 '/p:VisualStudioVersion=14.0' sets version location C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0
 '/tv:14.0' sets proj file targets
-
-
-basic msbuild operations (build,package,release) for node.js
-
 
 
 # example 
