@@ -1,16 +1,15 @@
 {
-  "author": "jonathan haker",
   "name": "msbuild",
+  "version": "0.2.7",
   "description": "msbuild helpers for .net apps",
-  "version": "0.2.6",
+  "main": "msbuild.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/jhaker/nodejs-msbuild.git"
   },
-    "bugs": {
+  "bugs": {
     "url": "https://github.com/jhaker/nodejs-msbuild/issues"
   },
-  "main": "msbuild.js",
   "dependencies": {
 		"async":"*",
 		"colors":"*",
@@ -26,5 +25,7 @@
   "optionalDependencies": {},
   "engines": {
     "node": "*"
-  }
+  },
+  "author": "jonathan haker",
+  "license": "MIT"
 }

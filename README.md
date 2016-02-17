@@ -1,36 +1,7 @@
 # msbuild - msbuild.exe for node.js
 
-### VS 2015 example
-```
-var _msbuild = require('msbuild');
-var msbuild = new _msbuild(function(){});
-msbuild.sourcePath = 'C:/local/myapp.sln';
-msbuild.configuration='Release';
-msbuild.publishProfile='Production_Environment';
-
-var overrideParams = [];
-	//VisualStudioVersion=14.0 => C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0
-	overrideParams.push('/p:VisualStudioVersion=14.0');
-	//tv:14.0 => overriding proj file targets
-	overrideParams.push('/tv:14.0');
-	overrideParams.push('/p:allowUntrustedCertificate=true');
-	overrideParams.push('/P:Password=myp@assword');
-	
-msbuild.config('overrideParams',overrideParams);
-msbuild.publish(); 
-```
-
-
-basic msbuild operations (build,package,release) for node.js
-
-##linux support added in version: "0.2.1" (thanks to richorama)
-
-## getting started
-view git project for more examples
-
-
-### example - build
-```
+# example - build
+``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
 msbuild.sourcePath = 'c:/your_app.sln';
@@ -39,8 +10,47 @@ msbuild.publishProfile='your_app_publish_profile';
 msbuild.build();
 ```
 
-### example - publish w/ verbose logging
+
+# install
+
+With [npm](https://www.npmjs.com/) do:
+
 ```
+npm install -g msbuild
+```
+
+
+# example 
+Visual Studio 2015 example 
+``` js
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(function(){});
+msbuild.sourcePath = 'c:/your_app.sln';
+msbuild.configuration='Release';
+msbuild.publishProfile='Production_Environment';
+
+var overrideParams = [];
+	overrideParams.push('/p:VisualStudioVersion=14.0');
+	overrideParams.push('/tv:14.0');
+	overrideParams.push('/p:allowUntrustedCertificate=true');
+	overrideParams.push('/P:Password=myp@assword');
+	
+msbuild.config('overrideParams',overrideParams);
+msbuild.publish(); 
+```
+'/p:VisualStudioVersion=14.0' sets version location C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0
+'/tv:14.0' sets proj file targets
+
+
+basic msbuild operations (build,package,release) for node.js
+
+
+
+# example 
+
+Publish w/ verbose logging.
+
+``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild();
 msbuild.sourcePath = 'c:/your_app.sln';
@@ -50,14 +60,17 @@ msbuild.verbose = true;
 msbuild.publish();
 ```
 
-### example - how to override exec to preview cmd arguments
-```
+
+# example 
+
+Preview cmd(s) before running by overriding exec. Can be helpful when troubleshooting.
+
+``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild();
 msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
-// override the exec function to output cmd 
 msbuild.exec  = function(cmd){
 	console.log('\nTEST 1: Preview MSBUILD Command');
 	console.log('********** test - start ************');
@@ -67,8 +80,12 @@ msbuild.exec  = function(cmd){
 msbuild.publish();
 ```
 
-### example - callback
-```
+
+# example
+
+Adding a callback.
+
+``` js
 var your_callback = function(){
 	console.log('msbuild done. move on...');
 }	
@@ -91,7 +108,13 @@ additional configuration parameters
 - `overrideParams`  property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug','/tv:4.0']  
 
 
-###Msbuild version "0.2.4" now available. 
+# notes / updates
+
+### View git project for more examples.
+
+### Linux support added in version: "0.2.1" (thanks to richorama)
+
+### Msbuild version "0.2.4" now available. 
 ```
 Changes include: 
 1. overrideParams validation has been corrected to support single character parameters 
@@ -99,15 +122,16 @@ Changes include:
 2. no longer requires "configuration" 
 3. no longer requires "publishProfile"
 
-NOTE:  "sourcePath" is required if the "configuration" and "publishProfile" are not defined
+"sourcePath" is required if the "configuration" and "publishProfile" are not defined
 ```
 
 
-####ISSUES/ERRORS
-ERROR: 
+# FAQ
+How do I resolve error MSB8020?
+
 `C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.Cpp.Platform.targets(64,5): error MSB8020: The build to
 ols for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found.`
 
-FIX: 
-either include overrideParams(`--msvs_version=2012`) or update your csproj files
+Answer: 
+include overrideParams(`--msvs_version=2012`) or update your csproj files
 	
