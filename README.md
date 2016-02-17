@@ -1,7 +1,8 @@
 # msbuild
+
 msbuild.exe for node.js
 
-clean, build, package, release using publish profiles and params
+Clean, Build, Package, Publish using publish profiles and params.
 
 
 # example
