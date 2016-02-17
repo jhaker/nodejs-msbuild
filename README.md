@@ -1,10 +1,11 @@
 # msbuild
 msbuild.exe for node.js
 
-basic msbuild operations (build,package,release) for node.js
+clean, build, package, release using publish profiles and/or params
 
 
-# example - build
+# example
+build
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
@@ -47,9 +48,7 @@ msbuild.publish();
 
 
 # example 
-
 Publish w/ verbose logging.
-
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild();
@@ -62,9 +61,7 @@ msbuild.publish();
 
 
 # example 
-
 Preview cmd(s) before running by overriding exec. Can be helpful when troubleshooting.
-
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild();
@@ -82,9 +79,7 @@ msbuild.publish();
 
 
 # example
-
 Adding a callback.
-
 ``` js
 var your_callback = function(){
 	console.log('msbuild done. move on...');
