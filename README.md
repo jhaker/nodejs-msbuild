@@ -11,8 +11,6 @@ Build.
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
 msbuild.sourcePath = 'c:/your_app.sln';
-msbuild.configuration = 'your_app_configuration';
-msbuild.publishProfile='your_app_publish_profile';
 msbuild.build();
 ```
 
