@@ -5,7 +5,6 @@ msbuild.exe for node.js
 Clean, Build, Package, Publish using publish profiles and params.
 
 
-# example
 Build.
 ``` js
 var _msbuild = require('msbuild');
@@ -20,12 +19,45 @@ msbuild.build();
 With [npm](https://www.npmjs.com/) do:
 
 ```
-npm install -g msbuild
+npm install msbuild
 ```
 
 
-# example 
-Visual Studio 2015 example 
+# examples
+
+### Build
+*note: sourcePath .sln
+``` js
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.sourcePath = 'c:/your_app.sln';
+msbuild.build();
+```
+
+
+### Publish
+*note: sourcePath .csproj
+``` js
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.sourcePath = 'c:/your_app.csproj';
+msbuild.overrideParams.push('/P:User=myusername');
+msbuild.overrideParams.push('/P:Password=myp@assword');
+msbuild.publish();
+```
+
+
+### Package
+*note: sourcePath .csproj
+``` js
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.sourcePath = 'c:/your_app.csproj';
+msbuild.package();
+```
+
+ 
+### Override targets and parameters
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(function(){});
@@ -46,31 +78,28 @@ msbuild.publish();
 '/tv:14.0' sets proj file targets
 
 
-# example 
-Publish w/ verbose logging.
+### Log only errors
 ``` js
 var _msbuild = require('msbuild');
-var msbuild = new _msbuild();
+var msbuild = new _msbuild(); 
 msbuild.sourcePath = 'c:/your_app.sln';
-msbuild.configuration = 'your_app_configuration';
-msbuild.publishProfile='your_app_publish_profile';
-msbuild.verbose = true; 
-msbuild.publish();
+msbuild.overrideParams.push('/clp:ErrorsOnly');
+msbuild.build();
 ```
 
 
-# example 
-Preview cmd(s) before running by overriding exec. Can be helpful when troubleshooting.
+### Preview commands and parameters by overriding exec. Can be helpful when troubleshooting.
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild();
 msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
-msbuild.exec  = function(cmd){
+msbuild.exec  = function(cmd,params,cb){
 	console.log('\nTEST 1: Preview MSBUILD Command');
 	console.log('********** test - start ************');
 	console.log(cmd);
+	console.log(params);
 	console.log('********** test - end  ************\n');
 }
 msbuild.publish();
@@ -105,6 +134,10 @@ additional configuration parameters
 # notes / updates
 
 ### View git project for more examples.
+
+### New target versions 
+		'12.0': '12.0',
+        '14.0': '14.0'
 
 ### Linux support added in version: "0.2.1" (thanks to richorama)
 

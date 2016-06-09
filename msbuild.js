@@ -6,11 +6,24 @@
  https://github.com/jhaker/nodejs-msbuild
 
 */
-
+if (!String.prototype.endsWith) {
+  String.prototype.endsWith = function(searchString, position) {
+      var subjectString = this.toString();
+      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+        position = subjectString.length;
+      }
+      position -= searchString.length;
+      var lastIndex = subjectString.indexOf(searchString, position);
+      return lastIndex !== -1 && lastIndex === position;
+  };
+}
 var events = require('events'),
 	async = require('async'),
 	colors = require('colors'),
-	fs = require('fs');
+	fs = require('fs'),
+	  path = require('path'),
+	  spawn = require('child_process').spawn;
+
 	
 var default_os = require('os').platform();
 if (default_os !== 'linux') default_os = "windows";
@@ -34,25 +47,43 @@ _.isPlainObject = function(obj){
 };
 
 var validateCmdParameter = function(param){
-	param += "";
-	param = param.trim();
 	if (param.length < 2)  return false;
 	if (param.substring(0, 1) !== "/")  return false;
 	return true;
+}
+var validFrameworkDir = function(dir) {
+	return dir.indexOf('1') === 0;
+}
+var getFrameworkDirectories = function(msbuildDir){
+	if (fs.existsSync(msbuildDir)) {
+		return fs.readdirSync(msbuildDir)
+			.filter(validFrameworkDir);
+	} else {
+		return [];
+	}
+}
+var mapProcessor = function(processor) {
+	if(!isNaN(processor) && processor !== undefined){
+		processor = 'x'+processor;
+	}
+	if(processor !== 'x64'){
+		processor = 'x86';
+	}
+	return processor;
 }
 
 var defaultPath = process.cwd();
 var lineBreak = '\n- - - - - - - - - - - - - - - -';
 
 var defaultValues = function(){
-		this.os 				= default_os;  // windows, linux
-		this.processor 			= 'x86';  //   'x86', 'x64'
-		this.version			= '4.0';  //  tools version; determines local path to msbuild.exe
-		this.sourcePath 		= defaultPath;  //  'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
-		this.configuration 		= undefined;   // solution configurations; targets an environment (debug,release)  
-		this.publishProfile 	= undefined;   //publish profiles; targets a specific machine (app01,app02)
-		this.outputPath 		= ''; 	//  'c:/deploys/release'
-		this.verbose 			= true;
+		this.os 				= default_os;  	// windows, linux
+		this.processor 			= 'x64';  		// 'x86', 'x64'
+		this.version			= '4.0';		// tools version; determines local path to msbuild.exe
+		this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
+		this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)  
+		this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
+		this.outputPath 		= ''; 			// 'c:/deploys/release'
+		this.verbose 			= false;
 		/*** 
 		property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
 		target framework overrides (example:  ['/tv:4.0'] )
@@ -65,11 +96,13 @@ var msbuild = function(){
 	this.showHelp = help == '?';
 	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
 	this.toolsVersion = {
-		'2.0': '2.0.50727',  // can only target 2.0
+		'2.0': '2.0.50727', 
 		'3.0':'3.0',
 		'3.5': '3.5',
-		'4.0': '4.0.30319', // can target 2.0, 3.0, 3.5 and 4
-		'4.5': '4.0.30319'
+		'4.0': '4.0.30319', 
+		'4.5': '4.0.30319',
+		'12.0': '12.0',
+        '14.0': '14.0'
 	};
 };
 
@@ -78,46 +111,60 @@ msbuild.prototype = new defaultValues();
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
 
 msbuild.prototype.getMSBuildPath = function(os,processor,framework){
-	if(os === 'linux') return "xbuild";
+	if(os === 'linux' || os === 'darwin') return "xbuild";
 	
-	var windir = process.env.WINDIR;
-	var frameworkprocessorDirectory = processor === 'x64' ? 'framework64' : 'framework';
-	var frameworkDirectory = 'v' + this.toolsVersion[framework];
-	return (windir + '\\Microsoft.NET\\' + frameworkprocessorDirectory + '\\' + frameworkDirectory + '\\msbuild.exe').toLowerCase();
+	var frameworkDirectories,programFilesDir,msbuildDir,exeDir;
+	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
+	msbuildDir = programFilesDir + '\\' + 'MSBuild';
+	frameworkDirectories = getFrameworkDirectories(msbuildDir);
+	
+	if (frameworkDirectories.length > 0) 
+		version = frameworkDirectories.pop();
+
+	exeDir = msbuildDir + '\\' + version + '\\' + 'bin';
+	processor = mapProcessor(processor);
+	
+	if(processor === 'x64')
+		exeDir = exeDir + '\\' + 'amd64';
+	
+	if (!fs.existsSync(exeDir)) 
+		exeDir = process.env.WINDIR + '\\' + 'microsoft.net' + '\\' + this.processors[processor] + '\\' + 'v' + this.toolsVersion[version];
+	
+	return exeDir + '\\' + 'msbuild.exe';
 }
 
 msbuild.prototype.buildexe = function(){
-	return this.getMSBuildPath(this.os,this.processor,this.version)
+	return this.getMSBuildPath(this.os,this.processor,this.version);
 }
 
 msbuild.prototype.config =  function(name, value) {
 
-	if(name.toLowerCase() === 'targetframework') 
-	{
+	if(name.toLowerCase() === 'targetframework') {
 		console.log('\n * CONFIG WARNING: \''.concat(name,'\'  has been deprecated\n   Please use overrideParams (example: overrideParams = [\'/tv:4.0\'] )\n'));
 		return;
-	}
+	}	
 	
 	var map;
-	
+
 	if (_.isPlainObject(name)) { map = name; } 
 	else if (value !== undefined) { this[name] = value; return this;	} 
 	else if (name === undefined) { return this.values; } 
 	else { return this[name]; }
 
 	for (var key in map) { this.values[name] = map[key]; }
+	
 	return this;
 };
 
 msbuild.prototype.setConfig = function(cg){
-		this.os = 								cg.os 										|| this.os;
-		this.processor =					cg.processor 						|| this.processor;
-		this.version =						  	cg.version 								|| this.version;
-		this.sourcePath = 					cg.sourcePath 						|| this.sourcePath;
-		this.configuration = 			  	cg.configuration 					|| this.configuration;  
-		this.publishProfile =			  	cg.publishProfile 					|| this.publishProfile;
-		this.overrideParams = 	  		cg.overrideParams 				|| this.overrideParams;
-		this.outputPath  =  				cg.outputPath 						|| this.outputPath;
+	this.os = 				cg.os 				|| this.os;
+	this.processor =		cg.processor 		|| this.processor;
+	this.version =			cg.version 			|| this.version;
+	this.sourcePath = 		cg.sourcePath 		|| this.sourcePath;
+	this.configuration = 	cg.configuration 	|| this.configuration;  
+	this.publishProfile =	cg.publishProfile 	|| this.publishProfile;
+	this.overrideParams = 	cg.overrideParams	|| this.overrideParams;
+	this.outputPath  =  	cg.outputPath		|| this.outputPath;
 }
 
 msbuild.prototype.abort = function (msg) {
@@ -126,112 +173,81 @@ msbuild.prototype.abort = function (msg) {
 	return;
 }
 
-msbuild.prototype.exec = function (cmd) {
+msbuild.prototype.exec = function(exe,params,cb){
 	var self = this;
-	if(self.showHelp) { self.printHelp(); return; } //abort 
+	if(self.showHelp) { self.printHelp(); return; } 
 	
-	var childProcess = require('child_process'), ls;
-	ls = childProcess.exec(cmd, function (error, stdout, stderr) {
+	function onClose(code) {
 		var msg = '';
-		if (error) {
-			msg = ('\nstack...\n' + error.stack).grey+('\n failed - errors'.white.redBG);
-			msg += '\n'+cmd;
-			self.emit('error',error.code,msg);
-			return;
-		}
-		else{
-			if(self.verbose){ msg = msg+(stdout.grey); }
-			msg = msg+('  finished - no errors'.white.greenBG);
+		if (code === 0) {
+			msg = msg+('\n finished - (0) errors'.white.greenBG);
 			self.emit('done',null,msg);
-		}
-	});
-}
+		 }
+		else {
+			msg = ('\n error code: ' + code).grey+('\n failed - errors'.white.redBG);
+			msg += '\n'+exe; 
+			if(params !== undefined && typeof params === 'array'){
+				params.forEach(function(p){msg += ' ' + p; }); 
+			}
+			self.emit('error',code,msg);
+			return;
+		}		
+		
+		cb();
+	}
 	
-msbuild.prototype.getDeployOnBuildParam = function(shouldDeploy){
-		if(!shouldDeploy){
-			shouldDeploy = false;
-		}
-		return ' /p:deployonbuild='.concat(shouldDeploy);
+    return spawn(exe, params, { stdio: 'inherit'}).on('close', onClose );
 }
 
 msbuild.prototype.getBuildParams = function(params){
-		if(!params){
-			params = '';
-		}
-		params += "";
-		
-		if(params.indexOf('configuration') === -1 && this.configuration){
-			params += (' /p:configuration='+this.configuration+' ');
-		}
-		if(params.indexOf('publishprofile') === -1 && this.publishProfile){
-			params += (' /p:publishprofile=' + this.publishProfile + ' ');
-		}
-		return params;
+	if(params.indexOf('configuration') === -1 && this.configuration)
+		params.push('/p:configuration='+this.configuration);
+	
+	if(params.indexOf('publishprofile') === -1 && this.publishProfile)
+		params.push('/p:publishprofile=' + this.publishProfile);
+	
+	return params;
 }
 
 msbuild.prototype.getPackageParams = function(params){
-		if(!params){
-			params = '';
-		}
-		params += "";
-		
-		if(params.indexOf('deployonbuild') === -1){
-				var deployOnBuildParam = this.getDeployOnBuildParam(false);
-				params += deployOnBuildParam;
-		}
-		if(params.indexOf('package') === -1){
-			params += (' /t:package '); 
-		}
-		if(params.indexOf('outputpath') === -1 && this.outputPath){
-			params += (' /p:outputpath='+this.outputPath+' '); 
-		}
-		return params;
+	if(params.indexOf('package') === -1)
+		params.push('/t:package'); 
+	
+	if(params.indexOf('deployonbuild') === -1)
+		params.push('/p:deployonbuild=false'); 
+
+	if(params.indexOf('outputpath') === -1 && this.outputPath)
+		params.push('/p:outputpath='+this.outputPath); 
+	
+	return params;
 }
 
 msbuild.prototype.getPublishParams = function(params){
-		if(!params){
-			params = '';
-		}
-		params += "";
-		
-		if(params.indexOf('deployonbuild') === -1){
-				var deployOnBuildParam = this.getDeployOnBuildParam(true);
-				params += (deployOnBuildParam);
-		}
-		return params;
+
+	if(params.indexOf('deployonbuild') === -1)
+		params.push('/p:deployonbuild=true'); 
+	
+	if(params.indexOf('allowUntrustedCertificate') === -1)
+		params.push('/p:allowUntrustedCertificate=true'); 
+
+	return params;
 }
 
 msbuild.prototype.getOverrideParams = function(params){
-		if(!params){
-			params = '';
+	this.overrideParams.forEach(function (param) {
+		if (!validateCmdParameter(param)) {
+			console.log('error: invalid parameter "'+param+'"');
+			return;
 		}
-		params += "";
-		
-		this.overrideParams.forEach(function (param) {
-		    if (!validateCmdParameter(param)) {
-				console.log('error: invalid parameter "'+param+'"');
-				return;
-			}
-		    params += (' ' + param + ' ');
-		});
-		return params;
+		params.push(param);
+	});
+	return params;
 }
 
 msbuild.prototype.emitStatusStart = function(action){
 	var startingMsg = ('  '+action+' starting').cyan;
 	this.emit('status',null,startingMsg);
 }	
-
-msbuild.prototype.setCmd = function(params){
-	var buildpath = this.buildexe();
-	if(!this.validateSourcePath()){
-		this.abort('aborting...bad source path');
-		return;
-	} 
-	else{
-		return buildpath.concat(' ',this.sourcePath,' ',params);
-	}
-}
 
 msbuild.prototype.validateSourcePath = function(){
 	if (fs.existsSync(this.sourcePath)) {
@@ -243,36 +259,89 @@ msbuild.prototype.validateSourcePath = function(){
 	}
 }
 
+msbuild.prototype.validateSourcePathIsSolution = function(){
+	if(this.sourcePath.endsWith('sln')){
+		return true;
+	}
+	else{
+		console.log('  bad source path: '+this.sourcePath);
+		return false;
+	}
+}
+
+msbuild.prototype.validateSourcePathIsProject = function(){
+	if(this.sourcePath.endsWith('proj')){
+		return true;
+	}
+	else{
+		console.log('  bad source path: '+this.sourcePath);
+		return false;
+	}
+}
+
 msbuild.prototype.build = function(){
 	this.emitStatusStart('build');
-	var params = this.getDeployOnBuildParam(false);
-		 params = this.getBuildParams(params);
-	var cmd = this.setCmd(params);
-	if(cmd){
-		this.exec(cmd);
-	}
+	
+	var params = [];
+	params.push(this.sourcePath);
+	this.getBuildParams(params);
+	this.getOverrideParams(params);
+	
+	if(!this.validateSourcePath()){
+		this.abort('aborting...bad source path');
+		return;
+	} 
+	
+	if(!this.validateSourcePathIsSolution()){
+		this.abort('aborting...bad source path. package requires file type sln.');
+		return;
+	} 
+	
+	this.exec(this.buildexe(),params,function(){console.log('build done');});
 }
 
 msbuild.prototype.package = function(){
 	this.emitStatusStart('package');
-	var params = this.getBuildParams();
-		 params = this.getOverrideParams(params);
-		 params = this.getPackageParams(params);
-	var cmd = this.setCmd(params);
-	if(cmd){
-		this.exec(cmd);
-	}
+	
+	var params = [];
+	params.push(this.sourcePath);
+	this.getBuildParams(params);
+	this.getOverrideParams(params);
+	this.getPackageParams(params);
+	
+	if(!this.validateSourcePath()){
+		this.abort('aborting...bad source path');
+		return;
+	} 
+	
+	if(!this.validateSourcePathIsProject()){
+		this.abort('aborting...bad source path. package requires file type proj.');
+		return;
+	} 
+
+	this.exec(this.buildexe(),params,function(){console.log('package done');});
 }
 
 msbuild.prototype.publish = function(){
 	this.emitStatusStart('publish');
-	var params = this.getBuildParams();
-		 params = this.getOverrideParams(params);
-		 params = this.getPublishParams(params);
-	var cmd = this.setCmd(params);
-	if(cmd){
-		this.exec(cmd);
-	}
+	
+	var params = [];
+	params.push(this.sourcePath);
+	this.getBuildParams(params);
+	this.getOverrideParams(params);
+	this.getPublishParams(params);
+	
+	if(!this.validateSourcePath()){
+		this.abort('aborting...bad source path');
+		return;
+	} 
+	
+	if(!this.validateSourcePathIsProject()){
+		this.abort('aborting...bad source path. package requires file type proj.');
+		return;
+	} 
+	
+	this.exec(this.buildexe(),params,function(){console.log('publish done');});
 }
 
 /****  help section ****/
