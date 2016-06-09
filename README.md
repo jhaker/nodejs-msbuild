@@ -5,7 +5,6 @@ msbuild.exe for node.js
 Clean, Build, Package, Publish using publish profiles and params.
 
 
-Build.
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
