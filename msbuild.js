@@ -110,6 +110,10 @@ msbuild.prototype = new defaultValues();
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
 
+msbuild.prototype.logger = function(msg){
+	console.log(msg);
+}
+
 msbuild.prototype.getMSBuildPath = function(os,processor,framework){
 	if(os === 'linux' || os === 'darwin') return "xbuild";
 	
@@ -140,7 +144,7 @@ msbuild.prototype.buildexe = function(){
 msbuild.prototype.config =  function(name, value) {
 
 	if(name.toLowerCase() === 'targetframework') {
-		console.log('\n * CONFIG WARNING: \''.concat(name,'\'  has been deprecated\n   Please use overrideParams (example: overrideParams = [\'/tv:4.0\'] )\n'));
+		this.logger('\n * CONFIG WARNING: \''.concat(name,'\'  has been deprecated\n   Please use overrideParams (example: overrideParams = [\'/tv:4.0\'] )\n'));
 		return;
 	}	
 	
@@ -236,7 +240,7 @@ msbuild.prototype.getPublishParams = function(params){
 msbuild.prototype.getOverrideParams = function(params){
 	this.overrideParams.forEach(function (param) {
 		if (!validateCmdParameter(param)) {
-			console.log('error: invalid parameter "'+param+'"');
+			this.logger('error: invalid parameter "'+param+'"');
 			return;
 		}
 		params.push(param);
@@ -254,7 +258,7 @@ msbuild.prototype.validateSourcePath = function(){
 		return true;
 	}
 	else{
-		console.log('  bad source path: '+this.sourcePath);
+		this.logger('  bad source path: '+this.sourcePath);
 		return false;
 	}
 }
@@ -264,7 +268,7 @@ msbuild.prototype.validateSourcePathIsSolution = function(){
 		return true;
 	}
 	else{
-		console.log('  bad source path: '+this.sourcePath);
+		this.logger('  bad source path: '+this.sourcePath);
 		return false;
 	}
 }
@@ -274,7 +278,7 @@ msbuild.prototype.validateSourcePathIsProject = function(){
 		return true;
 	}
 	else{
-		console.log('  bad source path: '+this.sourcePath);
+		this.logger('  bad source path: '+this.sourcePath);
 		return false;
 	}
 }
@@ -283,6 +287,7 @@ msbuild.prototype.build = function(){
 	this.emitStatusStart('build');
 	
 	var params = [];
+	var self = this;
 	params.push(this.sourcePath);
 	this.getBuildParams(params);
 	this.getOverrideParams(params);
@@ -297,7 +302,9 @@ msbuild.prototype.build = function(){
 		return;
 	} 
 	
-	this.exec(this.buildexe(),params,function(){console.log('build done');});
+	this.exec(this.buildexe(),params,function(){
+		self.logger('build done');
+	});
 }
 
 msbuild.prototype.package = function(){
@@ -319,7 +326,7 @@ msbuild.prototype.package = function(){
 		return;
 	} 
 
-	this.exec(this.buildexe(),params,function(){console.log('package done');});
+	this.exec(this.buildexe(),params,function(){this.logger('package done');});
 }
 
 msbuild.prototype.publish = function(){
@@ -341,52 +348,49 @@ msbuild.prototype.publish = function(){
 		return;
 	} 
 	
-	this.exec(this.buildexe(),params,function(){console.log('publish done');});
+	this.exec(this.buildexe(),params,function(){this.logger('publish done');});
 }
 
 /****  help section ****/
 msbuild.prototype.printHelp = function(){
 	var o = this;
 	var helpFunctionsToIgnore = ['exec','path','buildexe','on','once','emit','addListener','removeListener','removeAllListeners','listeners','setMaxListeners','printHelp'];
-	console.log("\nfunctions".cyan.bold);
-	console.log('*******************'.cyan);
+	this.logger("\nfunctions".cyan.bold);
+	this.logger('*******************'.cyan);
 	
 	for(var p in o){
 		if(typeof(o[p]) == 'function'){
 			if(helpFunctionsToIgnore.indexOf(p) > -1) continue;
 			if(p == 'printOptions') continue;
 			if(p == '?') continue;
-			console.log(p.redBG);
+			this.logger(p.redBG);
 		}
 	}
 	
-	console.log("\nevents".cyan.bold + ' [err,results]'.grey);
-	console.log('*******************'.cyan);
-	console.log('status'.redBG+' // msbuild.on(\'status\',myfunc)'.grey);
-	console.log('error'.redBG+' // msbuild.on(\'error\',myfunc)'.grey);
-	console.log('done'.redBG+' // msbuild.on(\'done\',myfunc)'.grey);
+	this.logger("\nevents".cyan.bold + ' [err,results]'.grey);
+	this.logger('*******************'.cyan);
+	this.logger('status'.redBG+' // msbuild.on(\'status\',myfunc)'.grey);
+	this.logger('error'.redBG+' // msbuild.on(\'error\',myfunc)'.grey);
+	this.logger('done'.redBG+' // msbuild.on(\'done\',myfunc)'.grey);
 }
 
 module.exports = function(callback){
 	var msb = new msbuild(callback);
-	msb.on('  status',function(err,results){ 
-		if(this.showHelp) return; 
-		if(err){ console.log(err.redBG);}; 
-			console.log(results);}
-		);
+	msb.on('status',function(err,results){ 
+			if(this.showHelp) return; 
+			if(err) this.logger(err.redBG);
+			this.logger(results);
+		});
 	msb.on('error',
 		function(err,results){ 
-			console.log('  error'.red); 
-			if(err){ 
-				console.log(err.redBG);
-			}; 
-			console.log(results.red);
-			});
+			this.logger('  error'.red); 
+			if(err) this.logger(err.redBG);
+			this.logger(results.red);
+		});
 	msb.on('done',function(err,results){ 
-		console.log(results); 
-		console.log(lineBreak);
-		if(typeof callback == 'function') callback();
-		}
-	);
+			this.logger(results); 
+			this.logger(lineBreak);
+			if(typeof callback == 'function') callback();
+		});
 	return msb;
 };

@@ -5,12 +5,14 @@ msbuild.exe for node.js
 Clean, Build, Package, Publish using publish profiles and params.
 
 
+
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
 msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.build();
 ```
+
 
 
 # install
@@ -105,8 +107,7 @@ msbuild.publish();
 ```
 
 
-# example
-Adding a callback.
+### Adding a callback.
 ``` js
 var your_callback = function(){
 	console.log('msbuild done. move on...');
@@ -118,6 +119,38 @@ msbuild.configuration = 'your_app_configuration';
 msbuild.publishProfile='your_app_publish_profile';
 msbuild.build();
 ```
+
+
+
+### Logging to file by overriding log method
+``` js
+var fs = require('fs');
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.logger =  function(results){
+	fs.appendFile('test.txt', '\n' + results, function (err) {});
+};
+``` 
+
+
+
+### Logging to file by extending events
+``` js
+var fs = require('fs');
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.on('status',function(err,results){ 
+	fs.appendFile('test.txt', '\nRESULTS: ' + results, function (err) {});
+});
+msbuild.on('error',function(err,results){ 
+	fs.appendFile('test.txt', '\nERROR: ' + results, function (err) {});
+});
+msbuild.on('done',function(err,results){ 
+	fs.appendFile('test.txt', '\nDONE: ' + results, function (err) {});
+});
+``` 
+
+
 
 additional configuration parameters
 - `os` currently only support windows
@@ -131,6 +164,13 @@ additional configuration parameters
 
 
 # notes / updates
+
+### Msbuild version "3.1.0" now available. 
+```
+Changes include: 
+1. console.log extracted to allow extension 
+2. minor formatting - adjustment of line indentations
+```
 
 ### View git project for more examples.
 
