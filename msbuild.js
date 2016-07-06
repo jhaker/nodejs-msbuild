@@ -106,14 +106,17 @@ var msbuild = function(){
 		'12.0': '12.0',
         '14.0': '14.0'
 	};
+
 	this.projectextensions = {
 		solutionextn: "sln",
 		projectextn: "proj"
 	};
 
-	if (fs.exists(approot.toString() + 'msbprojectextensions.json')){
+	var theprojextnconfigpath = path.normalize(approot.toString() + path.sep + 'msbprojectextensions.json');
 
-		var obj = require('./msbprojectextensions.json');
+	if (fs.existsSync(theprojextnconfigpath)){
+
+		var obj = require(theprojextnconfigpath);
 
 		if (obj.hasOwnProperty('slnextn')) {
 
