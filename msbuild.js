@@ -7,8 +7,6 @@
 
 */
 
-var msbcfg = require("./msbuild-config.json");
-
 if (!String.prototype.endsWith) {
   String.prototype.endsWith = function(searchString, position) {
       var subjectString = this.toString();
@@ -25,7 +23,8 @@ var events = require('events'),
 	colors = require('colors'),
 	fs = require('fs'),
 	  path = require('path'),
-	  spawn = require('child_process').spawn;
+	  spawn = require('child_process').spawn,
+	approot = require('app-root-path');
 
 	
 var default_os = require('os').platform();
@@ -107,6 +106,25 @@ var msbuild = function(){
 		'12.0': '12.0',
         '14.0': '14.0'
 	};
+	this.projectextensions = {
+		solutionextn: "sln",
+		projectextn: "proj"
+	};
+
+	if (fs.exists(approot.toString() + 'msbprojectextensions.json')){
+
+		var obj = require('./msbprojectextensions.json');
+
+		if (obj.hasOwnProperty('slnextn')) {
+
+			this.projectextensions.solutionextn = obj.slnextn;
+		}
+
+		if (obj.hasOwnProperty('projextn')) {
+
+			this.projectextensions.projectextn = obj.projextn;
+		}
+	}
 };
 
 msbuild.prototype = new defaultValues();
@@ -267,7 +285,7 @@ msbuild.prototype.validateSourcePath = function(){
 }
 
 msbuild.prototype.validateSourcePathIsSolution = function(){
-	if(this.sourcePath.endsWith(msbcfg.solutionextn)){
+	if(this.sourcePath.endsWith(this.projectextensions.solutionextn)){
 		return true;
 	}
 	else{
@@ -277,7 +295,7 @@ msbuild.prototype.validateSourcePathIsSolution = function(){
 }
 
 msbuild.prototype.validateSourcePathIsProject = function(){
-	if(this.sourcePath.endsWith(msbcfg.projectextn)){
+	if(this.sourcePath.endsWith(this.projectextensions.projectextn)){
 		return true;
 	}
 	else{
@@ -301,7 +319,7 @@ msbuild.prototype.build = function(){
 	} 
 	
 	if(!this.validateSourcePathIsSolution()){
-		this.abort('aborting...bad source path. package requires file type ' + msbcfg.solutionextn + '.');
+		this.abort('aborting...bad source path. package requires file type ' + this.projectextensions.solutionextn + '.');
 		return;
 	} 
 	
@@ -325,7 +343,7 @@ msbuild.prototype.package = function(){
 	} 
 	
 	if(!this.validateSourcePathIsProject()){
-		this.abort('aborting...bad source path. package requires file type ' + msbcfg.projectextn + '.');
+		this.abort('aborting...bad source path. package requires file type ' + this.projectextensions.projectextn + '.');
 		return;
 	} 
 
@@ -347,7 +365,7 @@ msbuild.prototype.publish = function(){
 	} 
 	
 	if(!this.validateSourcePathIsProject()){
-		this.abort('aborting...bad source path. package requires file type ' + msbcfg.projectextn + '.');
+		this.abort('aborting...bad source path. package requires file type ' + this.projectextensions.projectextn + '.');
 		return;
 	} 
 	

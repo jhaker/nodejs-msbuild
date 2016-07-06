@@ -11,6 +11,7 @@
     "url": "https://github.com/jhaker/nodejs-msbuild/issues"
   },
   "dependencies": {
+    "app-root-path": "^1.2.1",
     "async": "*",
     "colors": "*",
     "events": "*"
