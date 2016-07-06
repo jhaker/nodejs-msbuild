@@ -1,6 +1,6 @@
 {
   "name": "@redmonkeydf/msbuild-configurable",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "msbuild helpers for .net apps",
   "main": "msbuild.js",
   "repository": {
