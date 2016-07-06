@@ -1,26 +1,27 @@
 {
-  "name": "msbuild",
-  "version": "0.3.1",
+  "name": "@redmonkeydf/msbuild-configurable",
+  "version": "0.4.1",
   "description": "msbuild helpers for .net apps",
   "main": "msbuild.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jhaker/nodejs-msbuild.git"
+    "url": "https://github.com/RedmonkeyDF/nodejs-msbuildconfigurable.git"
   },
   "bugs": {
     "url": "https://github.com/jhaker/nodejs-msbuild/issues"
   },
   "dependencies": {
-		"async":"*",
-		"colors":"*",
-		"events":"*"
+    "app-root-path": "^1.2.1",
+    "async": "*",
+    "colors": "*",
+    "events": "*"
   },
   "devDependencies": {
-		"async":"*",
-		"colors":"*",
-		"events":"*",
-        "should": ">= 2.0.x",
-        "mocha": "~1.14.0"
+    "async": "*",
+    "colors": "*",
+    "events": "*",
+    "should": ">= 2.0.x",
+    "mocha": "~1.14.0"
   },
   "optionalDependencies": {},
   "engines": {

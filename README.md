@@ -2,6 +2,26 @@
 
 msbuild.exe for node.js
 
+**_This is a fork of [JHaker's nodejs-msbuild package](https://github.com/jhaker/nodejs-msbuild)_**
+
+**_It has been changed to allow the simple configurability of project name types._**
+
+__Configuring project extensions.__
+
+Create a file called msbprojectextensions.json in your project root, structured like the following:
+
+``` json
+{
+    "slnextn": "mycustomslnextention",
+    "projextn": "mycustomprojextn"
+}
+```
+
+This will configure the solution and project extensions usable by this package.  Defaults are .sln and .proj
+
+
+**_Below is the original readme._**
+
 Clean, Build, Package, Publish using publish profiles and params.
 
 
