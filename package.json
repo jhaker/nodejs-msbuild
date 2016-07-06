@@ -1,11 +1,11 @@
 {
-  "name": "msbuild",
+  "name": "msbuild-configurable",
   "version": "0.3.1",
   "description": "msbuild helpers for .net apps",
   "main": "msbuild.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jhaker/nodejs-msbuild.git"
+    "url": "https://github.com/RedmonkeyDF/nodejs-msbuildconfigurable.git"
   },
   "bugs": {
     "url": "https://github.com/jhaker/nodejs-msbuild/issues"
