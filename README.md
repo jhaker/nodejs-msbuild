@@ -2,6 +2,10 @@
 
 msbuild.exe for node.js
 
+**_This is a fork of [JHaker's nodejs-msbuild package](https://github.com/jhaker/nodejs-msbuild)_**
+
+**_It has been changed to allow the simple configurability of project name types._**
+
 Clean, Build, Package, Publish using publish profiles and params.
 
 

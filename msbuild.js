@@ -6,6 +6,9 @@
  https://github.com/jhaker/nodejs-msbuild
 
 */
+
+var msbcfg = require("./msbuild-config.json");
+
 if (!String.prototype.endsWith) {
   String.prototype.endsWith = function(searchString, position) {
       var subjectString = this.toString();
@@ -264,7 +267,7 @@ msbuild.prototype.validateSourcePath = function(){
 }
 
 msbuild.prototype.validateSourcePathIsSolution = function(){
-	if(this.sourcePath.endsWith('sln')){
+	if(this.sourcePath.endsWith(msbcfg.solutionextn)){
 		return true;
 	}
 	else{
@@ -274,7 +277,7 @@ msbuild.prototype.validateSourcePathIsSolution = function(){
 }
 
 msbuild.prototype.validateSourcePathIsProject = function(){
-	if(this.sourcePath.endsWith('proj')){
+	if(this.sourcePath.endsWith(msbcfg.projectextn)){
 		return true;
 	}
 	else{
@@ -298,7 +301,7 @@ msbuild.prototype.build = function(){
 	} 
 	
 	if(!this.validateSourcePathIsSolution()){
-		this.abort('aborting...bad source path. package requires file type sln.');
+		this.abort('aborting...bad source path. package requires file type ' + msbcfg.solutionextn + '.');
 		return;
 	} 
 	
@@ -322,7 +325,7 @@ msbuild.prototype.package = function(){
 	} 
 	
 	if(!this.validateSourcePathIsProject()){
-		this.abort('aborting...bad source path. package requires file type proj.');
+		this.abort('aborting...bad source path. package requires file type ' + msbcfg.projectextn + '.');
 		return;
 	} 
 
@@ -344,7 +347,7 @@ msbuild.prototype.publish = function(){
 	} 
 	
 	if(!this.validateSourcePathIsProject()){
-		this.abort('aborting...bad source path. package requires file type proj.');
+		this.abort('aborting...bad source path. package requires file type ' + msbcfg.projectextn + '.');
 		return;
 	} 
 	
