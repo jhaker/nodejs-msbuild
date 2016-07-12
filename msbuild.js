@@ -311,6 +311,7 @@ msbuild.prototype.package = function(){
 	this.emitStatusStart('package');
 	
 	var params = [];
+	var self = this;
 	params.push(this.sourcePath);
 	this.getBuildParams(params);
 	this.getOverrideParams(params);
@@ -326,13 +327,14 @@ msbuild.prototype.package = function(){
 		return;
 	} 
 
-	this.exec(this.buildexe(),params,function(){this.logger('package done');});
+	this.exec(this.buildexe(),params,function(){self.logger('package done');});
 }
 
 msbuild.prototype.publish = function(){
 	this.emitStatusStart('publish');
 	
 	var params = [];
+	var self = this;
 	params.push(this.sourcePath);
 	this.getBuildParams(params);
 	this.getOverrideParams(params);
@@ -348,7 +350,7 @@ msbuild.prototype.publish = function(){
 		return;
 	} 
 	
-	this.exec(this.buildexe(),params,function(){this.logger('publish done');});
+	this.exec(this.buildexe(),params,function(){self.logger('publish done');});
 }
 
 /****  help section ****/
