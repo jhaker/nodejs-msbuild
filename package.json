@@ -1,6 +1,6 @@
 {
   "name": "msbuild",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "msbuild helpers for .net apps",
   "main": "msbuild.js",
   "repository": {
