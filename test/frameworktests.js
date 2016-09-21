@@ -7,24 +7,28 @@ var mocha = require('mocha'),
 	var msbuild = new _msbuild(function(){});
 	
 	/******  SETUP    ******/
-	msbuild.outputPath = 'c:/mydeploys';
+		msbuild.exec  = function(cmd){
+		console.log('\nTEST 1: Preview MSBUILD Command');
+		console.log('********** test - start ************');
+		console.log(cmd);
+		console.log('********** test - end  ************\n');
+	}
+
 	msbuild.configuration = 'myconfiguration';
 	msbuild.publishProfile = 'mypublishprofile';
+	msbuild.sourcePath = '../examples/WebApplicationExamples/MvcExample/src/webexample1/webexample1.csproj';
+
+	/******  END SETUP    ******/
 	
+
+
+// call publish as the last step
+msbuild.publish(); 
 	/* uncomment to test empty overrides */
 	//msbuild.outputPath = '';
 	//msbuild.configuration = '';
 	//msbuild.publishProfile = '';
-	
-	msbuild.exec  = function(cmd){
-	
-	console.log('\nTEST 1: Preview MSBUILD Command');
-	console.log('********** test - start ************');
-	randomLog(cmd);
-	console.log('********** test - end  ************\n');
-	}
-	/******  END SETUP    ******/
-	
+
 	
 
 var randomLogIndex = 0;	
@@ -83,36 +87,38 @@ var MSBuildConfigs = [
 
 
 describe('msbuild',function(){
+	//TODO: write some tests...please
 	
-		 describe('MSBuildPath',function(){
-				 for(var config in MSBuildConfigs){
-					 var name = MSBuildConfigs[config].name;
-					 var expected = MSBuildConfigs[config].expected;
-					 var result = msbuild.getMSBuildPath(
-												 MSBuildConfigs[config].os,
-												 MSBuildConfigs[config].processor,
-												 MSBuildConfigs[config].framework);
-
-					 it(name + ' should match path',function(){
-						 result.should.equal(expected.toLowerCase());
-					 })
-				 }
-		 })
-		
 	
-		describe('LocalMSBuildPath',function(){			
-				for(var config in MSBuildConfigs){
-					var name = MSBuildConfigs[config].name;
-					var result = msbuild.getMSBuildPath(
-												MSBuildConfigs[config].os,
-												MSBuildConfigs[config].processor,
-												MSBuildConfigs[config].framework);
-					var dir = (result.replace('msbuild.exe',''));
-					fs.exists(dir, function( exists ) {        
-						log( ( exists  ? " Folder Exists: ".green : " Folder Missing: ".red.cyanBG ) + dir.grey );         
-					});
-				}
-		})
+	//	 describe('MSBuildPath',function(){
+	//			 for(var config in MSBuildConfigs){
+	//				 var name = MSBuildConfigs[config].name;
+	//				 var expected = MSBuildConfigs[config].expected;
+	//				 var result = msbuild.getMSBuildPath(
+	//											 MSBuildConfigs[config].os,
+	//											 MSBuildConfigs[config].processor,
+	//											 MSBuildConfigs[config].framework);
+    //
+	//				 it(name + ' should match path',function(){
+	//					 result.should.equal(expected.toLowerCase());
+	//				 })
+	//			 }
+	//	 })
+	//	
+	//
+	//	describe('LocalMSBuildPath',function(){			
+	//			for(var config in MSBuildConfigs){
+	//				var name = MSBuildConfigs[config].name;
+	//				var result = msbuild.getMSBuildPath(
+	//											MSBuildConfigs[config].os,
+	//											MSBuildConfigs[config].processor,
+	//											MSBuildConfigs[config].framework);
+	//				var dir = (result.replace('msbuild.exe',''));
+	//				fs.exists(dir, function( exists ) {        
+	//					log( ( exists  ? " Folder Exists: ".green : " Folder Missing: ".red.cyanBG ) + dir.grey );         
+	//				});
+	//			}
+	//	})
 		
 	
 
