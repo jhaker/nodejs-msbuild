@@ -16,6 +16,7 @@ var msbuild = new _msbuild(function(){});
 
 /*  configure  */
 	// min configuration required
+msbuild.sourcePath = 'WebApplicationExamples/MvcExample/src/webexample1/webexample1.csproj';
 msbuild.configuration='myconfiguration';
 msbuild.publishProfile='mypublishprofile';
 

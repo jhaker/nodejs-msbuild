@@ -13,7 +13,7 @@ var msbuild = new _msbuild(function(){});
 		console.log('********** test - end  ************\n');
 	}
 /* end setup */
-
+msbuild.sourcePath = 'WebApplicationExamples/MvcExample/src/webexample1/webexample1.csproj';
 msbuild.configuration='myconfiguration';
 msbuild.publishProfile='mypublishprofile';
 msbuild.outputPath='c:/mypackages/mypackagename';
