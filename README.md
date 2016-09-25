@@ -23,6 +23,9 @@ With [npm](https://www.npmjs.com/) do:
 npm install msbuild
 ```
 
+# examples
+[nodejs-msbuild-examples](https://github.com/jhaker/nodejs-msbuild-examples)
+
 
 # examples
 
