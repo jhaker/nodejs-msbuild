@@ -17,23 +17,29 @@ if (!String.prototype.endsWith) {
       return lastIndex !== -1 && lastIndex === position;
   };
 }
+
 var events = require('events'),
 	async = require('async'),
 	colors = require('colors'),
 	fs = require('fs'),
-	  path = require('path'),
-	  spawn = require('child_process').spawn;
+	path = require('path'),
+	spawn = require('child_process').spawn;
 
-	
 var default_os = require('os').platform();
+
 if (default_os !== 'linux') default_os = "windows";
 
 var args = [];
-for(var arg in process.argv) { args.push(process.argv[arg]); }
+
+for (var arg in process.argv) {
+     args.push(process.argv[arg]);
+}
+
 var help = args.splice(2,1);
 var x = function(){};
 var _ = new x();
-_.isPlainObject = function(obj){
+
+_.isPlainObject = function (obj) {
   var ctor, key;
   if (typeof obj != 'object' || !obj || toString.call(obj) != '[object Object]') {
     return false;
@@ -51,9 +57,11 @@ var validateCmdParameter = function(param){
 	if (param.substring(0, 1) !== "/")  return false;
 	return true;
 }
+
 var validFrameworkDir = function(dir) {
 	return dir.indexOf('1') === 0;
 }
+
 var getFrameworkDirectories = function(msbuildDir){
 	if (fs.existsSync(msbuildDir)) {
 		return fs.readdirSync(msbuildDir)
@@ -62,6 +70,7 @@ var getFrameworkDirectories = function(msbuildDir){
 		return [];
 	}
 }
+
 var mapProcessor = function(processor) {
 	if(!isNaN(processor) && processor !== undefined){
 		processor = 'x'+processor;
@@ -73,6 +82,7 @@ var mapProcessor = function(processor) {
 }
 
 var defaultPath = process.cwd();
+
 var lineBreak = '\n- - - - - - - - - - - - - - - -';
 
 var defaultValues = function(){
@@ -196,10 +206,9 @@ msbuild.prototype.exec = function(exe,params,cb){
 			self.emit('error',code,msg);
 			return;
 		}		
-		
 		cb();
 	}
-	
+
     return spawn(exe, params, { stdio: 'inherit'}).on('close', onClose );
 }
 
@@ -227,7 +236,6 @@ msbuild.prototype.getPackageParams = function(params){
 }
 
 msbuild.prototype.getPublishParams = function(params){
-
 	if(params.indexOf('deployonbuild') === -1)
 		params.push('/p:deployonbuild=true'); 
 	
@@ -253,34 +261,8 @@ msbuild.prototype.emitStatusStart = function(action){
 	this.emit('status',null,startingMsg);
 }	
 
-msbuild.prototype.validateSourcePath = function(){
-	if (fs.existsSync(this.sourcePath)) {
-		return true;
-	}
-	else{
-		this.logger('  bad source path: '+this.sourcePath);
-		return false;
-	}
-}
-
-msbuild.prototype.validateSourcePathIsSolution = function(){
-	if(this.sourcePath.endsWith('sln')){
-		return true;
-	}
-	else{
-		this.logger('  bad source path: '+this.sourcePath);
-		return false;
-	}
-}
-
-msbuild.prototype.validateSourcePathIsProject = function(){
-	if(this.sourcePath.endsWith('proj')){
-		return true;
-	}
-	else{
-		this.logger('  bad source path: '+this.sourcePath);
-		return false;
-	}
+msbuild.prototype.validateSourcePath = function () {
+    return fs.existsSync(this.sourcePath);
 }
 
 msbuild.prototype.build = function(){
@@ -293,12 +275,7 @@ msbuild.prototype.build = function(){
 	this.getOverrideParams(params);
 	
 	if(!this.validateSourcePath()){
-		this.abort('aborting...bad source path');
-		return;
-	} 
-	
-	if(!this.validateSourcePathIsSolution()){
-		this.abort('aborting...bad source path. package requires file type sln.');
+	    this.abort('aborting...bad source path');
 		return;
 	} 
 	
@@ -321,11 +298,6 @@ msbuild.prototype.package = function(){
 		this.abort('aborting...bad source path');
 		return;
 	} 
-	
-	if(!this.validateSourcePathIsProject()){
-		this.abort('aborting...bad source path. package requires file type proj.');
-		return;
-	} 
 
 	this.exec(this.buildexe(),params,function(){self.logger('package done');});
 }
@@ -345,15 +317,9 @@ msbuild.prototype.publish = function(){
 		return;
 	} 
 	
-	if(!this.validateSourcePathIsProject()){
-		this.abort('aborting...bad source path. package requires file type proj.');
-		return;
-	} 
-	
 	this.exec(this.buildexe(),params,function(){self.logger('publish done');});
 }
 
-/****  help section ****/
 msbuild.prototype.printHelp = function(){
 	var o = this;
 	var helpFunctionsToIgnore = ['exec','path','buildexe','on','once','emit','addListener','removeListener','removeAllListeners','listeners','setMaxListeners','printHelp'];

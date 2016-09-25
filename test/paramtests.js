@@ -21,8 +21,7 @@ var mocha = require('mocha'),
 describe('msbuild',function(){
 
 		describe('build params',function(){
-				//TODO: write some tests...please
+				//TODO: write some tests...looking help:)
 		})
-
 
 })

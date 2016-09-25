@@ -165,6 +165,14 @@ additional configuration parameters
 
 # notes / updates
 
+### Msbuild version "3.5.0" now available. 
+```
+Changes include: 
+1. removed csproj and sln validation. not necessary. 
+2. fixed broken tests commented out in release "3.4.0"
+3. moved examples into separate repo [nodejs-msbuild-examples](https://github.com/jhaker/nodejs-msbuild-examples)
+```
+
 ### Msbuild version "3.1.0" now available. 
 ```
 Changes include: 
