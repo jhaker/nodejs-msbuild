@@ -23,6 +23,14 @@ With [npm](https://www.npmjs.com/) do:
 npm install msbuild
 ```
 
+With [bower](https://bower.io) do:
+
+```
+bower install msbuild
+```
+
+
+
 # examples
 [nodejs-msbuild-examples](https://github.com/jhaker/nodejs-msbuild-examples)
 
