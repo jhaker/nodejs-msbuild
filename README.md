@@ -254,6 +254,6 @@ Platform=AnyCPU" -NonInteractive -OutputDirectory
 
 Answer: 
 
-Try removing "<BuildPackage>true</BuildPackage>" from project configuration file "*.csproj". It can be found near the top nested in <PropertyGroup>.
+Try removing `<BuildPackage>true</BuildPackage>` from project configuration file "*.csproj". It can be found near the top nested in `<PropertyGroup>`.
 
 If anyone knows why this worked in Visual Studio but not cmd line please post. 
