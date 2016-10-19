@@ -212,7 +212,8 @@ Changes include:
 
 
 # FAQ
-How do I resolve error MSB8020?
+
+### How do I resolve error MSB8020?
 
 `C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.Cpp.Platform.targets(64,5): error MSB8020: The build to
 ols for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found.`
@@ -220,3 +221,22 @@ ols for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found.`
 Answer: 
 include overrideParams(`--msvs_version=2012`) or update your csproj files
 	
+
+### I am able to build and package a project from Visual Studio but not through node msbuild. 
+
+build script
+```
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.sourcePath = 'C:/myproject/myproject.csproj'
+msbuild.package();
+```
+
+error
+```"C:\myproject\myproject.csproj" (package target) (1) ->(BuildPackage target) ->  C:\.nuget\NuGet.targets(109,9): error : The imported project "C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v12.0\WebApplications\Microsoft.WebApplication.targets" was not found. Confirm that the path in the <Import> declaration is correct,and that the file exists on disk.  C:\myproject\myproject.csproj [C:\myproject\myproject.csproj]  C:\.nuget\NuGet.targets(109,9): error MSB3073:The command ""..\.nuget\NuGet.exe" pack "C:\myproject\myproject.csproj" -Properties "Configuration=Debug;Platform=AnyCPU" -NonInteractive -OutputDirectory "C:\myproject\bin" -symbols" exited with code 1. [C:\myproject\myproject.csproj]    7 Warning(s)
+```
+
+Answer: 
+Try removing "<BuildPackage>true</BuildPackage>" from project configuration file "*.csproj". It can be found near the top nested in <PropertyGroup>.
+
+If anyone knows why this worked in Visual Studio but not cmd line please post. 
