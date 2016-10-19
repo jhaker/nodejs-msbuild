@@ -236,15 +236,18 @@ error
 ```
 "C:\myproject\myproject.csproj" (package target) (1) ->(
 BuildPackage target) ->  C:\.nuget\NuGet.targets(109,9): 
-error : The imported project "C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v12.0\WebApplications
+error : The imported project "C:\Program Files 
+(x86)\MSBuild\Microsoft\VisualStudio\v12.0\WebApplications
 \Microsoft.WebApplication.targets" was not found. 
 Confirm that the path in the <Import> declaration is 
 correct,and that the file exists on disk.  C:\myproject
-\myproject.csproj [C:\myproject\myproject.csproj]  C:\.nuget\NuGet.targets(109,9): error MSB3073:The 
+\myproject.csproj [C:\myproject\myproject.csproj] 
+C:\.nuget\NuGet.targets(109,9): error MSB3073:The 
 command ""..\.nuget\NuGet.exe" pack "C:\myproject
 \myproject.csproj" -Properties "Configuration=Debug;
 Platform=AnyCPU" -NonInteractive -OutputDirectory 
-"C:\myproject\bin" -symbols" exited with code 1. [C:\myproject\myproject.csproj]    7 Warning(s)
+"C:\myproject\bin" -symbols" exited with code 1. 
+[C:\myproject\myproject.csproj]    7 Warning(s)
 ```
 
 Answer: 
