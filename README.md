@@ -218,10 +218,12 @@ Changes include:
 `C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.Cpp.Platform.targets(64,5): error MSB8020: The build to
 ols for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found.`
 
-Answer: 
+Answer:
+ 
 include overrideParams(`--msvs_version=2012`) or update your csproj files
 	
 
+	
 ### I am able to build and package a project from Visual Studio but not through node msbuild. 
 
 build script
@@ -251,6 +253,7 @@ Platform=AnyCPU" -NonInteractive -OutputDirectory
 ```
 
 Answer: 
+
 Try removing "<BuildPackage>true</BuildPackage>" from project configuration file "*.csproj". It can be found near the top nested in <PropertyGroup>.
 
 If anyone knows why this worked in Visual Studio but not cmd line please post. 
