@@ -247,20 +247,19 @@ UNAUTHORIZED.) [C:\myproject\myproject.csproj]
 
 ## Answer: Add deployment credentials. 
 
-Option 1: Add to publish profile (myproject.pubxml) 
-Option 2: Pass into msbuild as a configuration parameter
+- Option 1: Add to publish profile (myproject.pubxml) 
+- Option 2: Pass into msbuild as a configuration parameter
 
-Examples
 
 (Option 1)
-Open "C:\myproject\Properties\PublishProfiles\" folder 
-Open myproject.pubxml in notepad or notepad++ 
-Add if it doesn't exist "<UserName>user_name</UserName>"
-Add if it doesn't exist "<Password>user_pwd</Password>"
-Run msbuild `>node myproject_publish.js`
+- Open "C:\myproject\Properties\PublishProfiles\" folder 
+- Open myproject.pubxml in notepad or notepad++ 
+- Add if it doesn't exist "<UserName>user_name</UserName>"
+- Add if it doesn't exist "<Password>user_pwd</Password>"
+
 
 (Option 2)
-Modify your build script by adding "'/P:User=user_name'" and "'/P:Password=user_pwd'" overrideParams.
+- Modify your build script by adding "'/P:User=user_name'" and "'/P:Password=user_pwd'" overrideParams.
 ```
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
@@ -271,7 +270,6 @@ msbuild.overrideParams.push('/P:User=user_name');
 msbuild.overrideParams.push('/P:Password=user_pwd');
 msbuild.publish();
 ```
-Run msbuild `>node myproject_publish.js`
 
 
 
