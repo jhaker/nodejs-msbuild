@@ -260,8 +260,8 @@ UNAUTHORIZED.) [C:\myproject\myproject.csproj]
 
 (Option 2)
 - Modify your build script by adding "'/P:User=user_name'" and "'/P:Password=user_pwd'" overrideParams.
-- Modified build script below
 ```
+/*** modified build script ***/
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
 msbuild.sourcePath = 'C:/myproject.sln'
