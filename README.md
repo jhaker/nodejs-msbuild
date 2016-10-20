@@ -247,7 +247,7 @@ UNAUTHORIZED.) [C:\myproject\myproject.csproj]
 
 
 
-## Answer: 
+### Answer: 
 Add deployment credentials. 
 
 - Option 1: Add to publish profile (myproject.pubxml) 
@@ -317,6 +317,6 @@ Platform=AnyCPU" -NonInteractive -OutputDirectory
 ```
 
 ### Answer: 
-Try removing `<BuildPackage>true</BuildPackage>` from project configuration file "*.csproj". It can be found near the top nested in `<PropertyGroup>`.
+Try removing `<BuildPackage>true</BuildPackage>` from project configuration file "*.csproj". It can be found near the top nested under `<PropertyGroup>`.
 
 If anyone knows why this worked in Visual Studio but not cmd line please post. 
