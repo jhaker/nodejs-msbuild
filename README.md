@@ -251,6 +251,7 @@ Option 1: Add to publish profile (myproject.pubxml)
 Option 2: Pass into msbuild as a configuration parameter
 
 Examples
+
 (Option 1)
 Open "C:\myproject\Properties\PublishProfiles\" folder 
 Open myproject.pubxml in notepad or notepad++ 
