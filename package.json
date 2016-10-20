@@ -1,7 +1,7 @@
 {
   "name": "msbuild",
-  "version": "0.3.9",
-  "description": "msbuild helpers for .net apps",
+  "version": "0.3.10",
+  "description": "msbuild wrapper",
   "main": "msbuild.js",
   "repository": {
     "type": "git",
