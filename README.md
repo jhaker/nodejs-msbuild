@@ -245,6 +245,8 @@ UNAUTHORIZED.) [C:\myproject\myproject.csproj]
     1 Error(s)
 ```
 
+
+
 ## Answer: Add deployment credentials. 
 
 - Option 1: Add to publish profile (myproject.pubxml) 
@@ -280,9 +282,10 @@ Microsoft.Cpp.Platform.targets(64,5): error MSB8020:
 The build tools for Visual Studio 2012 (Platform Toolset 
 = 'v110') cannot be found.`
 
-### Answer: include overrideParams(`--msvs_version=2012`) or update your csproj files
+### Answer: Include overrideParams(`--msvs_version=2012`) or update your csproj files
 	
 
+	
 ## error MSB3073
 ### I am able to build and package a project from Visual Studio but not through msbuild. 
 build script
