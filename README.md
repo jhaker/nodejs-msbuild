@@ -213,19 +213,78 @@ Changes include:
 
 # FAQ
 
-### How do I resolve error MSB8020?
 
-`C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.Cpp.Platform.targets(64,5): error MSB8020: The build to
-ols for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found.`
+## error ERROR_USER_UNAUTHORIZED
+build script
+```
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.sourcePath = 'C:/myproject.sln'
+msbuild.publishProfile = 'myproject';
+msbuild.configuration = 'release';
+msbuild.publish();
+```
 
-Answer:
- 
-include overrideParams(`--msvs_version=2012`) or update your csproj files
+
+error 
+```
+"C:\myproject\myproject.csproj" (default target) (1) ->
+(MSDeployPublish target) ->  C:\Program Files (x86)\MSBuild
+\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.
+targets(4295,5): msdeploy error ERROR_USER_UNAUTHORIZED: 
+Web deployment task failed. (Connected to the remote 
+computer ("173.248.134.47") using the Web Management Service, 
+but could not authorize. Make sure that you are using the 
+correct user name and password, that the site you are 
+connecting to exists, and that the credentials represent a 
+user who has permissions to access the site.  Learn more at:
+http://go.microsoft.com/fwlink/?LinkId=221672#ERROR_USER_
+UNAUTHORIZED.) [C:\myproject\myproject.csproj]
+
+    5 Warning(s)
+    1 Error(s)
+```
+
+## Answer: Add deployment credentials. 
+
+Option 1: Add to publish profile (myproject.pubxml) 
+Option 2: Pass into msbuild as a configuration parameter
+
+Examples
+(Option 1)
+Open "C:\myproject\Properties\PublishProfiles\" folder 
+Open myproject.pubxml in notepad or notepad++ 
+Add if it doesn't exist "<UserName>user_name</UserName>"
+Add if it doesn't exist "<Password>user_pwd</Password>"
+Run msbuild `>node myproject_publish.js`
+
+(Option 2)
+Modify your build script by adding "'/P:User=user_name'" and "'/P:Password=user_pwd'" overrideParams.
+```
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.sourcePath = 'C:/myproject.sln'
+msbuild.publishProfile = 'myproject';
+msbuild.configuration = 'release';
+msbuild.overrideParams.push('/P:User=user_name');
+msbuild.overrideParams.push('/P:Password=user_pwd');
+msbuild.publish();
+```
+Run msbuild `>node myproject_publish.js`
+
+
+
+## error MSB8020
+`C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\
+Microsoft.Cpp.Platform.targets(64,5): error MSB8020: 
+The build tools for Visual Studio 2012 (Platform Toolset 
+= 'v110') cannot be found.`
+
+### Answer: include overrideParams(`--msvs_version=2012`) or update your csproj files
 	
 
-	
-### I am able to build and package a project from Visual Studio but not through node msbuild. 
-
+## error MSB3073
+### I am able to build and package a project from Visual Studio but not through msbuild. 
 build script
 ```
 var _msbuild = require('msbuild');
@@ -252,8 +311,6 @@ Platform=AnyCPU" -NonInteractive -OutputDirectory
 [C:\myproject\myproject.csproj]    7 Warning(s)
 ```
 
-Answer: 
-
-Try removing `<BuildPackage>true</BuildPackage>` from project configuration file "*.csproj". It can be found near the top nested in `<PropertyGroup>`.
+### Answer: Try removing `<BuildPackage>true</BuildPackage>` from project configuration file "*.csproj". It can be found near the top nested in `<PropertyGroup>`.
 
 If anyone knows why this worked in Visual Studio but not cmd line please post. 
