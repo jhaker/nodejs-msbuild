@@ -254,12 +254,13 @@ UNAUTHORIZED.) [C:\myproject\myproject.csproj]
 (Option 1)
 - Open "C:\myproject\Properties\PublishProfiles\" folder 
 - Open myproject.pubxml in notepad or notepad++ 
-- Add if it doesn't exist "<UserName>user_name</UserName>"
-- Add if it doesn't exist "<Password>user_pwd</Password>"
+- Add "<UserName>user_name</UserName>"
+- Add "<Password>user_pwd</Password>"
 
 
 (Option 2)
 - Modify your build script by adding "'/P:User=user_name'" and "'/P:Password=user_pwd'" overrideParams.
+- Modified build script below
 ```
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
