@@ -54,7 +54,6 @@ _.isPlainObject = function (obj) {
 
 var validateCmdParameter = function(param){
 	if (param.length < 2)  return false;
-	if (param.substring(0, 1) !== "/")  return false;
 	return true;
 }
 
