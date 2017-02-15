@@ -58,7 +58,7 @@ var validateCmdParameter = function(param){
 }
 
 var validFrameworkDir = function(dir) {
-	return dir.indexOf('1') === 0;
+	return dir.match(/\d\.\d/g);
 }
 
 var getFrameworkDirectories = function(msbuildDir){
