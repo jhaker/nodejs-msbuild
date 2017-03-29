@@ -84,27 +84,26 @@ var defaultPath = process.cwd();
 
 var lineBreak = '\n- - - - - - - - - - - - - - - -';
 
-var defaultValues = function(){
-		this.os 				= default_os;  	// windows, linux
-		this.processor 			= 'x64';  		// 'x86', 'x64'
-		this.version			= '4.0';		// tools version; determines local path to msbuild.exe
-		this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
-		this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)  
-		this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
-		this.outputPath 		= ''; 			// 'c:/deploys/release'
-		this.verbose 			= false;
-		/*** 
-		property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
-		target framework overrides (example:  ['/tv:4.0'] )
-		***/
-		this.overrideParams		= [];
-}
-
 var msbuild = function(){
 	events.EventEmitter.call(this);
 	this.showHelp = help == '?';
 	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
-	this.toolsVersion = {
+	this.os 				= default_os;  	// windows, linux
+	this.processor 			= 'x64';  		// 'x86', 'x64'
+	this.version			= '4.0';		// tools version; determines local path to msbuild.exe
+	this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
+	this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)  
+	this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
+	this.outputPath 		= ''; 			// 'c:/deploys/release'
+	this.verbose 			= false;
+	/*** 
+	property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
+	target framework overrides (example:  ['/tv:4.0'] )
+	***/
+	this.overrideParams		= [];
+};
+
+msbuild.prototype.toolsVersion = {
 		'2.0': '2.0.50727', 
 		'3.0':'3.0',
 		'3.5': '3.5',
@@ -113,9 +112,6 @@ var msbuild = function(){
 		'12.0': '12.0',
         '14.0': '14.0'
 	};
-};
-
-msbuild.prototype = new defaultValues();
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
 
