@@ -119,7 +119,7 @@ msbuild.prototype.logger = function(msg){
 	console.log(msg);
 }
 
-msbuild.prototype.getMSBuildPath = function(os,processor,framework){
+msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	if(os === 'linux' || os === 'darwin') return "xbuild";
 	
 	var frameworkDirectories,programFilesDir,msbuildDir,exeDir;
@@ -127,8 +127,10 @@ msbuild.prototype.getMSBuildPath = function(os,processor,framework){
 	msbuildDir = programFilesDir + '\\' + 'MSBuild';
 	frameworkDirectories = getFrameworkDirectories(msbuildDir);
 	
-	if (frameworkDirectories.length > 0) 
-		version = frameworkDirectories.pop();
+	if(this.toolsVersion[version] == undefined ){
+		if (frameworkDirectories.length > 0) 
+			version = frameworkDirectories.pop();
+	}
 
 	exeDir = msbuildDir + '\\' + version + '\\' + 'bin';
 	processor = mapProcessor(processor);
