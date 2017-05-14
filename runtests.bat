@@ -1,7 +1,7 @@
 @ECHO OFF
 
 TITLE MSBUILDTests
-rem goto FRAMEWORKTESTS
+rem goto FRAMEWORKTESTS fails after 2017 release - someone please correct
 goto PARAMTESTS
 goto end
 

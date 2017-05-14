@@ -1,6 +1,6 @@
 {
   "name": "msbuild",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "msbuild wrapper",
   "main": "msbuild.js",
   "scripts": {
