@@ -123,7 +123,42 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	if(os === 'linux' || os === 'darwin') return "xbuild";
 	
 	var frameworkDirectories,programFilesDir,msbuildDir,exeDir;
+	var vs2017Type = {
+		Pro: 'Professional', 
+		Enterprise: 'Enterprise', 
+		Community: 'Community', 
+		BuildTools: 'BuildTools'
+	};
+
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
+
+	// For the msbuild 15.0 version, use the appropriate VS2017 directories
+	if (version === "15.0") {
+
+		// If VSINSTALLDIR env. var cannot be found, see what could be the directory by searching the usual suspects
+		// (while giving higher priority to the VS2017 IDE installs over the Build Tools only install)
+		if (process.env.vsInstallDir === undefined) {
+			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\2017\\';
+			if (fs.existsSync(possibleVSInstallDir + vs2017Type.Pro))
+				msbuildDir = possibleVSInstallDir + vs2017Type.Pro + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vs2017Type.Enterprise + '\\'))
+				msbuildDir = possibleVSInstallDir + vs2017Type.Enterprise + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vs2017Type.Community + '\\'))
+				msbuildDir = possibleVSInstallDir + vs2017Type.Community + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vs2017Type.BuildTools + '\\'))
+				msbuildDir = possibleVSInstallDir + vs2017Type.BuildTools + '\\';
+		}
+		else
+			msbuildDir = process.env.vsInstallDir;
+		
+		exeDir = msbuildDir + 'MSBuild\\15.0\\bin\\msbuild.exe';		
+	}
+
+	// If the msbuild.exe file exists, we are done.
+	if (exeDir != undefined && fs.existsSync(exeDir))
+		return exeDir;
+	
+	// Otherwise, look for the older msbuild versions
 	msbuildDir = programFilesDir + '\\' + 'MSBuild';
 	frameworkDirectories = getFrameworkDirectories(msbuildDir);
 	
