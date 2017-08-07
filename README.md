@@ -77,7 +77,6 @@ msbuild.publishProfile='Production_Environment';
 
 var overrideParams = [];
 	overrideParams.push('/p:VisualStudioVersion=14.0');
-	overrideParams.push('/tv:14.0');
 	overrideParams.push('/p:allowUntrustedCertificate=true');
 	overrideParams.push('/P:Password=myp@assword');
 	
