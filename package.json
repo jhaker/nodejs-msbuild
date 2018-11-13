@@ -37,13 +37,6 @@
   },
   "deprecated": false,
   "description": "msbuild wrapper",
-  "devDependencies": {
-    "async": "*",
-    "colors": "*",
-    "events": "*",
-    "mocha": "~1.14.0",
-    "should": ">= 2.0.x"
-  },
   "engines": {
     "node": "*"
   },
@@ -56,8 +49,5 @@
     "type": "git",
     "url": "git+https://github.com/jhaker/nodejs-msbuild.git"
   },
-  "scripts": {
-    "test": "mocha ./test/frameworktests"
-  },
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
