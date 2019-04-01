@@ -49,5 +49,5 @@
     "type": "git",
     "url": "git+https://github.com/jhaker/nodejs-msbuild.git"
   },
-  "version": "1.0.3"
+  "version": "1.0.4"
 }
