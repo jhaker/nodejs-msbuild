@@ -90,7 +90,7 @@ var msbuild = function(){
 	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
 	this.os 				= default_os;  	// windows, linux
 	this.processor 			= 'x64';  		// 'x86', 'x64'
-	this.version			= '4.0';		// tools version; determines local path to msbuild.exe
+	this.version			= '15.0';		// tools version; determines local path to msbuild.exe
 	this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
 	this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)  
 	this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
@@ -110,7 +110,8 @@ msbuild.prototype.toolsVersion = {
 		'4.0': '4.0.30319', 
 		'4.5': '4.0.30319',
 		'12.0': '12.0',
-        '14.0': '14.0'
+        '14.0':'14.0',
+		'15.0':'15.0'
 	};
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
@@ -151,7 +152,8 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 		else
 			msbuildDir = process.env.vsInstallDir;
 		
-		exeDir = msbuildDir + 'MSBuild\\15.0\\bin\\msbuild.exe';		
+		exeDir = msbuildDir + 'MSBuild\\15.0\\bin\\msbuild.exe';	
+
 	}
 
 	// If the msbuild.exe file exists, we are done.
@@ -176,6 +178,7 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	if (!fs.existsSync(exeDir)) 
 		exeDir = process.env.WINDIR + '\\' + 'microsoft.net' + '\\' + this.processors[processor] + '\\' + 'v' + this.toolsVersion[version];
 	
+		
 	return exeDir + '\\' + 'msbuild.exe';
 }
 

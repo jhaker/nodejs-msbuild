@@ -1,34 +1,53 @@
 {
-  "name": "msbuild",
-  "version": "1.0.2",
-  "description": "msbuild wrapper",
-  "main": "msbuild.js",
-  "scripts": {
-    "test": "mocha ./test/frameworktests"
+  "_from": "msbuild",
+  "_id": "msbuild@1.0.3",
+  "_inBundle": false,
+  "_integrity": "sha512-TabbjPSpIznu5cJo/fmkS5vtO/vY5kgRgFZBygTbNs19TLKo9091SwdluugTDH5Hp6wfgrFtojtIvKsyh8//xg==",
+  "_location": "/msbuild",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "msbuild",
+    "name": "msbuild",
+    "escapedName": "msbuild",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jhaker/nodejs-msbuild.git"
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/msbuild/-/msbuild-1.0.2.tgz",
+  "_shasum": "59c7ceda191bce2ddc4b114f3c2a97f71d777a0f",
+  "_spec": "msbuild",
+  "_where": "C:\\_pearson\\picolms\\build",
+  "author": {
+    "name": "jonathan haker"
   },
   "bugs": {
     "url": "https://github.com/jhaker/nodejs-msbuild/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "async": "*",
     "colors": "*",
     "events": "*"
   },
-  "devDependencies": {
-    "async": "*",
-    "colors": "*",
-    "events": "*",
-    "should": ">= 2.0.x",
-    "mocha": "~1.14.0"
-  },
-  "optionalDependencies": {},
+  "deprecated": false,
+  "description": "msbuild wrapper",
   "engines": {
     "node": "*"
   },
-  "author": "jonathan haker",
-  "license": "MIT"
+  "homepage": "https://github.com/jhaker/nodejs-msbuild#readme",
+  "license": "MIT",
+  "main": "msbuild.js",
+  "name": "msbuild",
+  "optionalDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhaker/nodejs-msbuild.git"
+  },
+  "version": "1.0.3"
 }
