@@ -2,6 +2,13 @@
 
 Clean. Build. Package. Publish.
 
+``` js
+var _msbuild = require('..').__msbuild;
+var msbuild = new _msbuild(function(){});
+msbuild.sourcePath = 'c:/your_app.sln';
+msbuild.config('version','16.0')
+msbuild.build(); 
+``` js
 
 
 ``` js

@@ -111,7 +111,8 @@ msbuild.prototype.toolsVersion = {
 		'4.5': '4.0.30319',
 		'12.0': '12.0',
         '14.0':'14.0',
-		'15.0':'15.0'
+		'15.0':'15.0',
+		'16.0':'16.0'
 	};
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
@@ -124,36 +125,47 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	if(os === 'linux' || os === 'darwin') return "xbuild";
 	
 	var frameworkDirectories,programFilesDir,msbuildDir,exeDir;
-	var vs2017Type = {
-		Pro: 'Professional', 
+	var vsEditions = {
+		Preview : 'Preview',
+		Professional: 'Professional', 
 		Enterprise: 'Enterprise', 
 		Community: 'Community', 
 		BuildTools: 'BuildTools'
 	};
-
+	
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
 
-	// For the msbuild 15.0 version, use the appropriate VS2017 directories
-	if (version === "15.0") {
-
+	function getvsInstallDir(possibleVSInstallDir){
 		// If VSINSTALLDIR env. var cannot be found, see what could be the directory by searching the usual suspects
 		// (while giving higher priority to the VS2017 IDE installs over the Build Tools only install)
 		if (process.env.vsInstallDir === undefined) {
-			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\2017\\';
-			if (fs.existsSync(possibleVSInstallDir + vs2017Type.Pro))
-				msbuildDir = possibleVSInstallDir + vs2017Type.Pro + '\\';
-			else if (fs.existsSync(possibleVSInstallDir + vs2017Type.Enterprise + '\\'))
-				msbuildDir = possibleVSInstallDir + vs2017Type.Enterprise + '\\';
-			else if (fs.existsSync(possibleVSInstallDir + vs2017Type.Community + '\\'))
-				msbuildDir = possibleVSInstallDir + vs2017Type.Community + '\\';
-			else if (fs.existsSync(possibleVSInstallDir + vs2017Type.BuildTools + '\\'))
-				msbuildDir = possibleVSInstallDir + vs2017Type.BuildTools + '\\';
+			if (fs.existsSync(possibleVSInstallDir + vsEditions.Professional))
+				return possibleVSInstallDir + vsEditions.Professional + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vsEditions.Enterprise + '\\'))
+				return possibleVSInstallDir + vsEditions.Enterprise + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vsEditions.Community + '\\'))
+				return possibleVSInstallDir + vsEditions.Community + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vsEditions.Preview))
+				return possibleVSInstallDir + vsEditions.Preview + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vsEditions.BuildTools + '\\'))
+				return possibleVSInstallDir + vsEditions.BuildTools + '\\';
 		}
 		else
-			msbuildDir = process.env.vsInstallDir;
-		
-		exeDir = msbuildDir + 'MSBuild\\15.0\\bin\\msbuild.exe';	
-
+			return process.env.vsInstallDir;
+	}
+	
+	// For the msbuild 15.0 version, use the appropriate VS2017 directories
+	if (version === "15.0") {
+		msbuildDir = getvsInstallDir(programFilesDir + '\\' + 'Microsoft Visual Studio\\2017\\');
+		exeDir = msbuildDir + 'MSBuild\\'+version+'\\bin\\msbuild.exe';	
+	}
+	
+	// For the msbuild 16.0 version, use the appropriate VS2019 directories
+	if (version === "16.0") {
+		msbuildDir = getvsInstallDir(programFilesDir + '\\' + 'Microsoft Visual Studio\\2019\\');
+		exeDir = msbuildDir + 'MSBuild\\'+version+'\\bin\\msbuild.exe';	
+		if (!(fs.existsSync(exeDir)))
+			exeDir = msbuildDir + 'MSBuild\\Current\\bin\\msbuild.exe';		
 	}
 
 	// If the msbuild.exe file exists, we are done.

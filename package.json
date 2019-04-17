@@ -1,6 +1,6 @@
 {
   "_from": "msbuild",
-  "_id": "msbuild@1.0.3",
+  "_id": "msbuild@1.1.0",
   "_inBundle": false,
   "_integrity": "sha512-TabbjPSpIznu5cJo/fmkS5vtO/vY5kgRgFZBygTbNs19TLKo9091SwdluugTDH5Hp6wfgrFtojtIvKsyh8//xg==",
   "_location": "/msbuild",
@@ -15,6 +15,7 @@
     "saveSpec": null,
     "fetchSpec": "latest"
   },
+  "main": "msbuild.js",
   "_requiredBy": [
     "#USER",
     "/"
@@ -49,5 +50,5 @@
     "type": "git",
     "url": "git+https://github.com/jhaker/nodejs-msbuild.git"
   },
-  "version": "1.0.3"
+  "version": "1.1.0"
 }
