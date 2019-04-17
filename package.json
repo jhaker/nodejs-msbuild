@@ -1,6 +1,6 @@
 {
   "_from": "msbuild",
-  "_id": "msbuild@1.1.0",
+  "_id": "msbuild@1.1.2",
   "_inBundle": false,
   "_integrity": "sha512-TabbjPSpIznu5cJo/fmkS5vtO/vY5kgRgFZBygTbNs19TLKo9091SwdluugTDH5Hp6wfgrFtojtIvKsyh8//xg==",
   "_location": "/msbuild",
