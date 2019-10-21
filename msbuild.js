@@ -154,6 +154,12 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 			return process.env.vsInstallDir;
 	}
 	
+	// For the msbuild 14.0 version
+	if (version === "14.0") {
+		msbuildDir = getvsInstallDir(programFilesDir + '\\' + 'Microsoft Visual Studio\\2017\\');
+		exeDir = msbuildDir + 'MSBuild\\'+version+'\\bin\\msbuild.exe';	
+	}
+	
 	// For the msbuild 15.0 version, use the appropriate VS2017 directories
 	if (version === "15.0") {
 		msbuildDir = getvsInstallDir(programFilesDir + '\\' + 'Microsoft Visual Studio\\2017\\');
