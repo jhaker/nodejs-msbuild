@@ -131,10 +131,10 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 		Community: 'Community',
 		BuildTools: 'BuildTools'
 	};
-
+	
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
 
-	// For the msbuild 15.0 pr 16.0 version, use the appropriate VS2017 pr VS2019 directories
+// For the msbuild 15.0 pr 16.0 version, use the appropriate VS2017 pr VS2019 directories
 	if (version === "15.0" || version === "16.0") {
 
 		// MSBuild 16.0 is installed in the "\current" folder under each version of Visual Studio or BuildTools folder.
