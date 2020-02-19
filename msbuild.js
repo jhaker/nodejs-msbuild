@@ -90,14 +90,14 @@ var msbuild = function(){
 	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
 	this.os 				= default_os;  	// windows, linux
 	this.processor 			= 'x64';  		// 'x86', 'x64'
-	this.version			= '15.0';		// tools version; determines local path to msbuild.exe
+	this.version			= 'current';		// tools version; determines local path to msbuild.exe
 	this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
-	this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)  
+	this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)
 	this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
 	this.outputPath 		= ''; 			// 'c:/deploys/release'
 	this.verbose 			= false;
-	/*** 
-	property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  ) 
+	/***
+	property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  )
 	target framework overrides (example:  ['/tv:4.0'] )
 	***/
 	this.overrideParams		= [];
@@ -110,9 +110,9 @@ msbuild.prototype.toolsVersion = {
 		'4.0': '4.0.30319', 
 		'4.5': '4.0.30319',
 		'12.0': '12.0',
-        '14.0':'14.0',
-		'15.0':'15.0',
-		'16.0':'16.0'
+    '14.0': '14.0',
+		'15.0': '(not used)',
+		'16.0': '(not used)'
 	};
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
@@ -123,65 +123,63 @@ msbuild.prototype.logger = function(msg){
 
 msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	if(os === 'linux' || os === 'darwin') return "xbuild";
-	
+
 	var frameworkDirectories,programFilesDir,msbuildDir,exeDir;
-	var vsEditions = {
-		Preview : 'Preview',
-		Professional: 'Professional', 
-		Enterprise: 'Enterprise', 
-		Community: 'Community', 
+	var vsIdeType = {
+		Pro: 'Professional',
+		Enterprise: 'Enterprise',
+		Community: 'Community',
 		BuildTools: 'BuildTools'
 	};
 	
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
 
-	function getvsInstallDir(possibleVSInstallDir){
-		// If VSINSTALLDIR env. var cannot be found, see what could be the directory by searching the usual suspects
-		// (while giving higher priority to the VS2017 IDE installs over the Build Tools only install)
-		if (process.env.vsInstallDir === undefined) {
-			if (fs.existsSync(possibleVSInstallDir + vsEditions.Professional))
-				return possibleVSInstallDir + vsEditions.Professional + '\\';
-			else if (fs.existsSync(possibleVSInstallDir + vsEditions.Enterprise + '\\'))
-				return possibleVSInstallDir + vsEditions.Enterprise + '\\';
-			else if (fs.existsSync(possibleVSInstallDir + vsEditions.Community + '\\'))
-				return possibleVSInstallDir + vsEditions.Community + '\\';
-			else if (fs.existsSync(possibleVSInstallDir + vsEditions.Preview))
-				return possibleVSInstallDir + vsEditions.Preview + '\\';
-			else if (fs.existsSync(possibleVSInstallDir + vsEditions.BuildTools + '\\'))
-				return possibleVSInstallDir + vsEditions.BuildTools + '\\';
+// For the msbuild 15.0 pr 16.0 version, use the appropriate VS2017 pr VS2019 directories
+	if (version === "15.0" || version === "16.0") {
+
+		// MSBuild 16.0 is installed in the "\current" folder under each version of Visual Studio or BuildTools folder.
+		// See https://docs.microsoft.com/en-us/visualstudio/msbuild/whats-new-msbuild-16-0?view=vs-2019
+		var vsIdeVersion = "2019";
+		var msBuildSubDir = "current";
+
+		// MSBuild 15.0 is installed in the "\15.0" folder under each version of Visual Studio or BuildTools folder.
+		// See https://docs.microsoft.com/en-us/visualstudio/msbuild/what-s-new-in-msbuild-15-0?view=vs-2017
+		if (version === "15.0") {
+			vsIdeVersion = "2017";
+			msBuildSubDir = version;
 		}
-		else
-			return process.env.vsInstallDir;
-	}
-	
-	// For the msbuild 14.0 version
-	if (version === "14.0") {
-		msbuildDir = getvsInstallDir(programFilesDir + '\\' + 'Microsoft Visual Studio\\2017\\');
-		exeDir = msbuildDir + 'MSBuild\\'+version+'\\bin\\msbuild.exe';	
-	}
-	
-	// For the msbuild 15.0 version, use the appropriate VS2017 directories
-	if (version === "15.0") {
-		msbuildDir = getvsInstallDir(programFilesDir + '\\' + 'Microsoft Visual Studio\\2017\\');
-		exeDir = msbuildDir + 'MSBuild\\'+version+'\\bin\\msbuild.exe';	
-	}
-	
-	// For the msbuild 16.0 version, use the appropriate VS2019 directories
-	if (version === "16.0") {
-		msbuildDir = getvsInstallDir(programFilesDir + '\\' + 'Microsoft Visual Studio\\2019\\');
-		exeDir = msbuildDir + 'MSBuild\\'+version+'\\bin\\msbuild.exe';	
-		if (!(fs.existsSync(exeDir)))
-			exeDir = msbuildDir + 'MSBuild\\Current\\bin\\msbuild.exe';		
+
+		// If VSINSTALLDIR env. var cannot be found, see what could be the directory by searching the usual suspects
+		// (while giving higher priority to the VS2017/2019 IDE installs over the Build Tools only install)
+		if (process.env.vsInstallDir === undefined) {
+			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\' + vsIdeVersion + '\\';
+			if (fs.existsSync(possibleVSInstallDir + vsIdeType.Pro))
+				msbuildDir = possibleVSInstallDir + vsIdeType.Pro + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.Enterprise + '\\'))
+				msbuildDir = possibleVSInstallDir + vsIdeType.Enterprise + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.Community + '\\'))
+				msbuildDir = possibleVSInstallDir + vsIdeType.Community + '\\';
+			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.BuildTools + '\\'))
+				msbuildDir = possibleVSInstallDir + vsIdeType.BuildTools + '\\';
+		}
+		else {
+			msbuildDir = process.env.vsInstallDir;
+		}
+
+		exeDir = msbuildDir + 'MSBuild\\' + msBuildSubDir + '\\bin\\msbuild.exe';
+		// console.log('found msbuild.exe dir = ' + exeDir);
 	}
 
 	// If the msbuild.exe file exists, we are done.
-	if (exeDir != undefined && fs.existsSync(exeDir))
+	if (exeDir != undefined && fs.existsSync(exeDir)) {
+		// console.log('using msbuild 15.0+ exeDir = ' + exeDir)
 		return exeDir;
-	
+	}
+
 	// Otherwise, look for the older msbuild versions
 	msbuildDir = programFilesDir + '\\' + 'MSBuild';
 	frameworkDirectories = getFrameworkDirectories(msbuildDir);
-	
+
 	if(this.toolsVersion[version] == undefined ){
 		if (frameworkDirectories.length > 0) 
 			version = frameworkDirectories.pop();
@@ -189,14 +187,13 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 
 	exeDir = msbuildDir + '\\' + version + '\\' + 'bin';
 	processor = mapProcessor(processor);
-	
+
 	if(processor === 'x64')
 		exeDir = exeDir + '\\' + 'amd64';
-	
-	if (!fs.existsSync(exeDir)) 
+
+	if (!fs.existsSync(exeDir))
 		exeDir = process.env.WINDIR + '\\' + 'microsoft.net' + '\\' + this.processors[processor] + '\\' + 'v' + this.toolsVersion[version];
-	
-		
+
 	return exeDir + '\\' + 'msbuild.exe';
 }
 
