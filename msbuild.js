@@ -90,7 +90,7 @@ var msbuild = function(){
 	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
 	this.os 				= default_os;  	// windows, linux
 	this.processor 			= 'x64';  		// 'x86', 'x64'
-	this.version			= 'current';		// tools version; determines local path to msbuild.exe
+	this.version			= 'current';	// tools version; determines local path to msbuild.exe
 	this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
 	this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)
 	this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
@@ -110,9 +110,10 @@ msbuild.prototype.toolsVersion = {
 		'4.0': '4.0.30319', 
 		'4.5': '4.0.30319',
 		'12.0': '12.0',
-    '14.0': '14.0',
+    	'14.0': '14.0',
 		'15.0': '(not used)',
-		'16.0': '(not used)'
+		'16.0': '(not used)',
+		'17.0': '(not used)'
 	};
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
@@ -134,12 +135,15 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
 
-// For the msbuild 15.0 pr 16.0 version, use the appropriate VS2017 pr VS2019 directories
-	if (version === "15.0" || version === "16.0") {
+	// For the msbuild 15, 16 & 17 versions, use the appropriate VS2017, VS2019 & VS2022 directories
+	if (version === "15.0" || version === "16.0" || version === "17.0") {
 
-		// MSBuild 16.0 is installed in the "\current" folder under each version of Visual Studio or BuildTools folder.
+		// MSBuild 16.0 & 17.0 is installed in the "\current" folder under each version of Visual Studio or BuildTools folder.
 		// See https://docs.microsoft.com/en-us/visualstudio/msbuild/whats-new-msbuild-16-0?view=vs-2019
-		var vsIdeVersion = "2019";
+		if (version === "17.0")
+			vsIdeVersion = "2022";
+		else
+			vsIdeVersion = "2019";
 		var msBuildSubDir = "current";
 
 		// MSBuild 15.0 is installed in the "\15.0" folder under each version of Visual Studio or BuildTools folder.
