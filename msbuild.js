@@ -134,12 +134,12 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	};
 	
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
+	console.log('Found "programFiles" dir = ' + programFilesDir);
 
-	// For the msbuild 15, 16 & 17 versions, use the appropriate VS2017, VS2019 & VS2022 directories
+	// For the msbuild 15+ versions, use the appropriate VS2017, VS2019 & VS2022 directories
 	if (version === "15.0" || version === "16.0" || version === "17.0") {
 
-		// MSBuild 16.0 & 17.0 is installed in the "\current" folder under each version of Visual Studio or BuildTools folder.
-		// See https://docs.microsoft.com/en-us/visualstudio/msbuild/whats-new-msbuild-16-0?view=vs-2019
+		// MSBuild versions 16+ are installed in the "\current" folder under respective Visual Studio or BuildTools folders.
 		if (version === "17.0")
 			vsIdeVersion = "2022";
 		else
@@ -153,10 +153,16 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 			msBuildSubDir = version;
 		}
 
+		console.log('Looking for install of VS IDE Version ' + vsIdeVersion + ' with MsBuild sub-dir = ' + msBuildSubDir);
+
 		// If VSINSTALLDIR env. var cannot be found, see what could be the directory by searching the usual suspects
-		// (while giving higher priority to the VS2017/2019 IDE installs over the Build Tools only install)
+		// (while giving higher priority to the VS2017/2019/2022 IDE installs over the Build Tools only install)
+		// Note: This assumes these VS are installed on the drive stated in "programFilesDir".
 		if (process.env.vsInstallDir === undefined) {
+			
 			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\' + vsIdeVersion + '\\';
+			console.log('VSINSTALLDIR env. var cannot be found; possible VS install dir = ' + possibleVSInstallDir);
+			
 			if (fs.existsSync(possibleVSInstallDir + vsIdeType.Pro))
 				msbuildDir = possibleVSInstallDir + vsIdeType.Pro + '\\';
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.Enterprise + '\\'))
@@ -165,13 +171,23 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 				msbuildDir = possibleVSInstallDir + vsIdeType.Community + '\\';
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.BuildTools + '\\'))
 				msbuildDir = possibleVSInstallDir + vsIdeType.BuildTools + '\\';
+			else {
+				// todo: try searching programFilesDir on another drive (usually D:\) or find a better way to get the VS install folder.
+				console.log('** Could not find VS IDE / tools install folder. Please install at least the VS Build Tools in the "programFiles" dir. **');
+				msbuildDir = '(not found)';
+				
+				return '';
+			}
+
+			console.log('Assuming MS Build sub-dir = ' + msbuildDir);
 		}
 		else {
 			msbuildDir = process.env.vsInstallDir;
+			console.log('VSINSTALLDIR env. var found; using msBuild sub-dir = ' + msbuildDir);
 		}
 
 		exeDir = msbuildDir + 'MSBuild\\' + msBuildSubDir + '\\bin\\msbuild.exe';
-		// console.log('found msbuild.exe dir = ' + exeDir);
+		console.log('Using msbuild.exe dir = ' + exeDir);
 	}
 
 	// If the msbuild.exe file exists, we are done.
