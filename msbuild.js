@@ -90,7 +90,7 @@ var msbuild = function(){
 	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
 	this.os 				= default_os;  	// windows, linux
 	this.processor 			= 'x64';  		// 'x86', 'x64'
-	this.version			= 'current';		// tools version; determines local path to msbuild.exe
+	this.version			= 'current';	// tools version; determines local path to msbuild.exe
 	this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
 	this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)
 	this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
@@ -110,9 +110,10 @@ msbuild.prototype.toolsVersion = {
 		'4.0': '4.0.30319', 
 		'4.5': '4.0.30319',
 		'12.0': '12.0',
-    '14.0': '14.0',
+    	'14.0': '14.0',
 		'15.0': '(not used)',
-		'16.0': '(not used)'
+		'16.0': '(not used)',
+		'17.0': '(not used)'
 	};
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
@@ -133,13 +134,16 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	};
 	
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
+	console.log('Found "programFiles" dir = ' + programFilesDir);
 
-// For the msbuild 15.0 pr 16.0 version, use the appropriate VS2017 pr VS2019 directories
-	if (version === "15.0" || version === "16.0") {
+	// For the msbuild 15+ versions, use the appropriate VS2017, VS2019 & VS2022 directories
+	if (version === "15.0" || version === "16.0" || version === "17.0") {
 
-		// MSBuild 16.0 is installed in the "\current" folder under each version of Visual Studio or BuildTools folder.
-		// See https://docs.microsoft.com/en-us/visualstudio/msbuild/whats-new-msbuild-16-0?view=vs-2019
-		var vsIdeVersion = "2019";
+		// MSBuild versions 16+ are installed in the "\current" folder under respective Visual Studio or BuildTools folders.
+		if (version === "17.0")
+			vsIdeVersion = "2022";
+		else
+			vsIdeVersion = "2019";
 		var msBuildSubDir = "current";
 
 		// MSBuild 15.0 is installed in the "\15.0" folder under each version of Visual Studio or BuildTools folder.
@@ -149,10 +153,16 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 			msBuildSubDir = version;
 		}
 
+		console.log('Looking for install of VS IDE Version ' + vsIdeVersion + ' with MsBuild sub-dir = ' + msBuildSubDir);
+
 		// If VSINSTALLDIR env. var cannot be found, see what could be the directory by searching the usual suspects
-		// (while giving higher priority to the VS2017/2019 IDE installs over the Build Tools only install)
+		// (while giving higher priority to the VS2017/2019/2022 IDE installs over the Build Tools only install)
+		// Note: This assumes these VS are installed on the drive stated in "programFilesDir".
 		if (process.env.vsInstallDir === undefined) {
+			
 			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\' + vsIdeVersion + '\\';
+			console.log('VSINSTALLDIR env. var cannot be found; possible VS install dir = ' + possibleVSInstallDir);
+			
 			if (fs.existsSync(possibleVSInstallDir + vsIdeType.Pro))
 				msbuildDir = possibleVSInstallDir + vsIdeType.Pro + '\\';
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.Enterprise + '\\'))
@@ -161,13 +171,23 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 				msbuildDir = possibleVSInstallDir + vsIdeType.Community + '\\';
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.BuildTools + '\\'))
 				msbuildDir = possibleVSInstallDir + vsIdeType.BuildTools + '\\';
+			else {
+				// todo: try searching programFilesDir on another drive (usually D:\) or find a better way to get the VS install folder.
+				console.log('** Could not find VS IDE / tools install folder. Please install at least the VS Build Tools in the "programFiles" dir. **');
+				msbuildDir = '(not found)';
+				
+				return '';
+			}
+
+			console.log('Assuming MS Build sub-dir = ' + msbuildDir);
 		}
 		else {
 			msbuildDir = process.env.vsInstallDir;
+			console.log('VSINSTALLDIR env. var found; using msBuild sub-dir = ' + msbuildDir);
 		}
 
 		exeDir = msbuildDir + 'MSBuild\\' + msBuildSubDir + '\\bin\\msbuild.exe';
-		// console.log('found msbuild.exe dir = ' + exeDir);
+		console.log('Using msbuild.exe dir = ' + exeDir);
 	}
 
 	// If the msbuild.exe file exists, we are done.
