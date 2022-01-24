@@ -18,7 +18,18 @@ msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.build();
 ```
 
+# build path environment variable 
+```
+Variable name: MsbuildPath
+Variable value: <your path to msbuild> 
+```
 
+```
+Example for VS 2022
+
+Variable name: MsbuildPath
+Variable value: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin
+```
 
 # install
 
