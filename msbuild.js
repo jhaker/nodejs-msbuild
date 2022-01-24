@@ -23,7 +23,8 @@ var events = require('events'),
 	colors = require('colors'),
 	fs = require('fs'),
 	path = require('path'),
-	spawn = require('child_process').spawn;
+	spawn = require('child_process').spawn,
+	util = require('util');
 
 var default_os = require('os').platform();
 
@@ -110,10 +111,10 @@ msbuild.prototype.toolsVersion = {
 		'4.0': '4.0.30319', 
 		'4.5': '4.0.30319',
 		'12.0': '12.0',
-    	'14.0': '14.0',
-		'15.0': '(not used)',
-		'16.0': '(not used)',
-		'17.0': '(not used)'
+    		'14.0': '14.0',
+		'15.0': '15.0',
+		'16.0': '16.0',
+		'17.0': '17.0'
 	};
 
 msbuild.prototype.__proto__ = events.EventEmitter.prototype;
@@ -123,6 +124,16 @@ msbuild.prototype.logger = function(msg){
 }
 
 msbuild.prototype.getMSBuildPath = function(os,processor,version){
+	
+	if(process.env.MsbuildPath && fs.existsSync(process.env.MsbuildPath)){
+		return process.env.MsbuildPath + '\\' + 'msbuild.exe';
+	}
+	
+	//use latest version if not provided
+	if(version === undefined){
+		version = "17.0";
+	}
+	
 	if(os === 'linux' || os === 'darwin') return "xbuild";
 
 	var frameworkDirectories,programFilesDir,msbuildDir,exeDir;
@@ -152,8 +163,6 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 			msBuildSubDir = version;
 		}
 
-		console.log('Looking for MsBuild directory for VS IDE Version ' + vsIdeVersion);
-
 		// If VSINSTALLDIR env. var cannot be found, see what could be the directory by searching the usual suspects
 		// (while giving higher priority to the VS2017/2019/2022 IDE installs over the Build Tools only install)
 		// Note: This assumes these VS are installed on the drive stated in "programFilesDir".
@@ -180,8 +189,6 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 			
 			programFilesDir = process.env['programfiles'];
 			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\' + vsIdeVersion + '\\';
-			var teeeee = possibleVSInstallDir + vsIdeType.Community + '\\';
-			console.log('Found 64bit ' + teeeee);
 		}
 
 		if (process.env.vsInstallDir === undefined) {
@@ -197,8 +204,7 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.BuildTools + '\\'))
 				msbuildDir = possibleVSInstallDir + vsIdeType.BuildTools + '\\';
 		}
-		
-		
+
 		if(msbuildDir === undefined){
 			console.log('** Could not find VS IDE / tools install folder. Please install at least the VS Build Tools in the "programFiles" dir. **');
 		}else {
@@ -211,7 +217,6 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 
 	// If the msbuild.exe file exists, we are done.
 	if (exeDir != undefined && fs.existsSync(exeDir)) {
-		// console.log('using msbuild 15.0+ exeDir = ' + exeDir)
 		return exeDir;
 	}
 
@@ -430,6 +435,14 @@ msbuild.prototype.printHelp = function(){
 	this.logger('error'.redBG+' // msbuild.on(\'error\',myfunc)'.grey);
 	this.logger('done'.redBG+' // msbuild.on(\'done\',myfunc)'.grey);
 }
+
+var log_file = fs.createWriteStream(__dirname + '/log.txt', {flags : 'w'});
+var log_stdout = process.stdout;
+
+console.log = function(d) { //
+  log_file.write(util.format(d) + '\n');
+  log_stdout.write(util.format(d) + '\n');
+};
 
 module.exports = function(callback){
 	var msb = new msbuild(callback);
