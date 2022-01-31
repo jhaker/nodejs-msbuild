@@ -77,6 +77,8 @@ msbuild.package();
 ### Logging to file 
 If you wish to log to file override "msbuild.logger". See example below. 
 ``` js
+var fs = require('fs');
+var util = require('util');
 var log_file = fs.createWriteStream(__dirname + '/log.txt', {flags : 'w'});
 var log_stdout = process.stdout;
 
