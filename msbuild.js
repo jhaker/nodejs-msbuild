@@ -436,14 +436,6 @@ msbuild.prototype.printHelp = function(){
 	this.logger('done'.redBG+' // msbuild.on(\'done\',myfunc)'.grey);
 }
 
-var log_file = fs.createWriteStream(__dirname + '/log.txt', {flags : 'w'});
-var log_stdout = process.stdout;
-
-console.log = function(d) { //
-  log_file.write(util.format(d) + '\n');
-  log_stdout.write(util.format(d) + '\n');
-};
-
 module.exports = function(callback){
 	var msb = new msbuild(callback);
 	msb.on('status',function(err,results){ 

@@ -2,36 +2,8 @@
 
 Clean. Build. Package. Publish.
 
-``` js
-var _msbuild = require('msbuild');
-var msbuild = new _msbuild(); 
-msbuild.sourcePath = 'c:/your_app.sln';
-msbuild.config('version','17.0')
-msbuild.build(); 
-``` 
 
-
-``` js
-var _msbuild = require('msbuild');
-var msbuild = new _msbuild(); 
-msbuild.sourcePath = 'c:/your_app.sln';
-msbuild.build();
-```
-
-# build path environment variable 
-```
-Variable name: MsbuildPath
-Variable value: <your path to msbuild> 
-```
-
-```
-Example for VS 2022
-
-Variable name: MsbuildPath
-Variable value: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin
-```
-
-# install
+## Install
 
 With [npm](https://www.npmjs.com/) do:
 
@@ -45,22 +17,39 @@ With [bower](https://bower.io) do:
 bower install msbuild
 ```
 
+## Configure - optional build path environment variable 
+```
+Variable name: MsbuildPath
+Variable value: <your path to msbuild> 
+```
+
+```
+Example for VS 2022
+
+Variable name: MsbuildPath
+Variable value: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin
+```
 
 
-# examples
+## Examples
 [nodejs-msbuild-examples](https://github.com/jhaker/nodejs-msbuild-examples)
 
 
-# examples
-
 ### Build
-*note: sourcePath .sln
 ``` js
 var _msbuild = require('msbuild');
 var msbuild = new _msbuild(); 
 msbuild.sourcePath = 'c:/your_app.sln';
 msbuild.build();
 ```
+
+``` js
+var _msbuild = require('msbuild');
+var msbuild = new _msbuild(); 
+msbuild.sourcePath = 'c:/your_app.sln';
+msbuild.config('version','17.0')
+msbuild.build(); 
+``` 
 
 
 ### Publish
@@ -84,6 +73,19 @@ msbuild.sourcePath = 'c:/your_app.csproj';
 msbuild.package();
 ```
 
+
+### Logging to file 
+If you wish to log to file override "msbuild.logger". See example below. 
+``` js
+var log_file = fs.createWriteStream(__dirname + '/log.txt', {flags : 'w'});
+var log_stdout = process.stdout;
+
+msbuild.logger = function(d) { //
+  log_file.write(util.format(d) + '\n');
+  log_stdout.write(util.format(d) + '\n');
+};
+```
+ 
  
 ### Override targets and parameters
 ``` js
@@ -147,7 +149,6 @@ msbuild.build();
 ```
 
 
-
 ### Logging to file by overriding log method
 ``` js
 var fs = require('fs');
@@ -157,7 +158,6 @@ msbuild.logger =  function(results){
 	fs.appendFile('test.txt', '\n' + results, function (err) {});
 };
 ``` 
-
 
 
 ### Logging to file by extending events
@@ -177,7 +177,6 @@ msbuild.on('done',function(err,results){
 ``` 
 
 
-
 additional configuration parameters
 - `os` currently only support windows
 - `processor` 	'x86', 'x64'
@@ -189,7 +188,7 @@ additional configuration parameters
 - `overrideParams`  property overrides ['/p:WarningLevel=2','/p:OutputDir=bin\Debug','/tv:4.0']  
 
 
-# notes / updates
+## Notes / Updates
 
 ### Msbuild version "3.5.0" now available. 
 ```
@@ -199,12 +198,14 @@ Changes include:
 3. moved examples into separate repo [nodejs-msbuild-examples](https://github.com/jhaker/nodejs-msbuild-examples)
 ```
 
+
 ### Msbuild version "3.1.0" now available. 
 ```
 Changes include: 
 1. console.log extracted to allow extension 
 2. minor formatting - adjustment of line indentations
 ```
+
 
 ### View git project for more examples.
 
@@ -226,10 +227,10 @@ Changes include:
 ```
 
 
-# FAQ
+## FAQ
 
 
-## error ERROR_USER_UNAUTHORIZED
+## Error: ERROR_USER_UNAUTHORIZED
 build script
 ```
 var _msbuild = require('msbuild');
@@ -239,7 +240,6 @@ msbuild.publishProfile = 'myproject';
 msbuild.configuration = 'release';
 msbuild.publish();
 ```
-
 
 error 
 ```
@@ -259,7 +259,6 @@ UNAUTHORIZED.) [C:\myproject\myproject.csproj]
     5 Warning(s)
     1 Error(s)
 ```
-
 
 
 ### Answer: 
@@ -292,7 +291,7 @@ msbuild.publish();
 
 
 
-## error MSB8020
+## Error: MSB8020
 `C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\
 Microsoft.Cpp.Platform.targets(64,5): error MSB8020: 
 The build tools for Visual Studio 2012 (Platform Toolset 
@@ -302,8 +301,8 @@ The build tools for Visual Studio 2012 (Platform Toolset
 Include overrideParams(`--msvs_version=2012`) or update your csproj files
 	
 
-	
-## error MSB3073
+
+## Error: MSB3073
 ### I am able to build and package a project from Visual Studio but not through msbuild. 
 build script
 ```
