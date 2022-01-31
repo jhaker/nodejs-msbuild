@@ -1,4 +1,4 @@
-# NodeJS MSBuild
+# nodejs-msbuild
 
 Clean. Build. Package. Publish. 
 
