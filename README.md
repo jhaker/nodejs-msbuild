@@ -1,6 +1,6 @@
-# msbuild
+# NodeJS MSBuild
 
-Clean. Build. Package. Publish.
+Clean. Build. Package. Publish. 
 
 
 ## Install
