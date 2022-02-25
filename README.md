@@ -17,17 +17,24 @@ With [bower](https://bower.io) do:
 bower install msbuild
 ```
 
-## Configure - optional build path environment variable 
+
+## Override build path 
 ```
-Variable name: MsbuildPath
-Variable value: <your path to msbuild> 
+msbuild.msbuildPath = 'c:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\msbuild.exe'
+```
+
+
+## Override build path using using environment variable
+```
+name: MsbuildPath
+value: <your path to msbuild> 
 ```
 
 ```
 Example for VS 2022
 
-Variable name: MsbuildPath
-Variable value: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin
+name: MsbuildPath
+value: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin
 ```
 
 

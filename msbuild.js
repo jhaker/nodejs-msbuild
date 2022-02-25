@@ -87,16 +87,17 @@ var lineBreak = '\n- - - - - - - - - - - - - - - -';
 
 var msbuild = function(){
 	events.EventEmitter.call(this);
-	this.showHelp = help == '?';
-	this.processors = { 'x86': 'Framework', 'x64': 'Framework64' };
-	this.os 				= default_os;  	// windows, linux
+	this.showHelp 			= help == '?';
+	this.processors 		= { 'x86': 'Framework', 'x64': 'Framework64' };
+	this.os 			= default_os;  	// windows, linux
 	this.processor 			= 'x64';  		// 'x86', 'x64'
 	this.version			= 'current';	// tools version; determines local path to msbuild.exe
 	this.sourcePath 		= defaultPath;  // 'c:/mypath/mysolution.sln'   or   'c:/mypath/myproject.csproj
 	this.configuration 		= undefined;   	// solution configurations; targets an environment (debug,release)
-	this.publishProfile 	= undefined;   	// publish profiles; targets a specific machine (app01,app02)
+	this.publishProfile 		= undefined;   	// publish profiles; targets a specific machine (app01,app02)
 	this.outputPath 		= ''; 			// 'c:/deploys/release'
 	this.verbose 			= false;
+	this.msbuildPath 		= undefined;   //'c:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\'
 	/***
 	property overrides (example: ['/clp:ErrorsOnly;', '/p:WarningLevel=2','/p:OutputDir=bin\Debug']  )
 	target framework overrides (example:  ['/tv:4.0'] )
@@ -124,6 +125,19 @@ msbuild.prototype.logger = function(msg){
 }
 
 msbuild.prototype.getMSBuildPath = function(os,processor,version){
+	if(this.msbuildPath !== undefined){
+		this.msbuildPath = this.msbuildPath.toLowerCase();
+		if(this.msbuildPath.includes('/')){
+			this.msbuildPath = this.msbuildPath.replaceAll('/', '\\');
+		}
+		if(this.msbuildPath.endsWith('\\')){
+			this.msbuildPath = this.msbuildPath + 'msbuild.exe';
+		}
+		if(this.msbuildPath.endsWith('bin')){
+			this.msbuildPath = this.msbuildPath + '\\msbuild.exe';
+		}
+		return this.msbuildPath;
+	}
 	
 	if(process.env.MsbuildPath && fs.existsSync(process.env.MsbuildPath)){
 		return process.env.MsbuildPath + '\\' + 'msbuild.exe';
