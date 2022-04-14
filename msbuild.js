@@ -1,6 +1,6 @@
 /*
  msbuild.js
- 
+
  copyright (c) 2014 jonathan haker
  Licensed under the MIT license.
  https://github.com/jhaker/nodejs-msbuild
@@ -106,10 +106,10 @@ var msbuild = function(){
 };
 
 msbuild.prototype.toolsVersion = {
-		'2.0': '2.0.50727', 
+		'2.0': '2.0.50727',
 		'3.0':'3.0',
 		'3.5': '3.5',
-		'4.0': '4.0.30319', 
+		'4.0': '4.0.30319',
 		'4.5': '4.0.30319',
 		'12.0': '12.0',
     		'14.0': '14.0',
@@ -138,16 +138,16 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 		}
 		return this.msbuildPath;
 	}
-	
+
 	if(process.env.MsbuildPath && fs.existsSync(process.env.MsbuildPath)){
 		return process.env.MsbuildPath + '\\' + 'msbuild.exe';
 	}
-	
+
 	//use latest version if not provided
 	if(version === undefined){
 		version = "17.0";
 	}
-	
+
 	if(os === 'linux' || os === 'darwin') return "xbuild";
 
 	var frameworkDirectories,programFilesDir,msbuildDir,exeDir;
@@ -157,9 +157,9 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 		Community: 'Community',
 		BuildTools: 'BuildTools'
 	};
-	
+
 	programFilesDir = process.env['programfiles(x86)'] || process.env.PROGRAMFILES;
-	
+
 	// For the msbuild 15+ versions, use the appropriate VS2017, VS2019 & VS2022 directories
 	if (version === "15.0" || version === "16.0" || version === "17.0") {
 
@@ -181,9 +181,9 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 		// (while giving higher priority to the VS2017/2019/2022 IDE installs over the Build Tools only install)
 		// Note: This assumes these VS are installed on the drive stated in "programFilesDir".
 		if (process.env.vsInstallDir === undefined) {
-			
+
 			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\' + vsIdeVersion + '\\';
-			
+
 			if (fs.existsSync(possibleVSInstallDir + vsIdeType.Pro))
 				msbuildDir = possibleVSInstallDir + vsIdeType.Pro + '\\';
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.Enterprise + '\\'))
@@ -191,24 +191,24 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.Community + '\\'))
 				msbuildDir = possibleVSInstallDir + vsIdeType.Community + '\\';
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.BuildTools + '\\'))
-				msbuildDir = possibleVSInstallDir + vsIdeType.BuildTools + '\\';	
+				msbuildDir = possibleVSInstallDir + vsIdeType.BuildTools + '\\';
 		}
 		else {
 			msbuildDir = process.env.vsInstallDir;
-			console.log('VSINSTALLDIR env. ' + msbuildDir);
+			this.logger('VSINSTALLDIR env. ' + msbuildDir);
 		}
-		
-		// Try 64bit if msbuild dir missing 
+
+		// Try 64bit if msbuild dir missing
 		if (msbuildDir === undefined) {
-			
+
 			programFilesDir = process.env['programfiles'];
 			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\' + vsIdeVersion + '\\';
 		}
 
 		if (process.env.vsInstallDir === undefined) {
-			
+
 			var possibleVSInstallDir = programFilesDir + '\\' + 'Microsoft Visual Studio\\' + vsIdeVersion + '\\';
-			
+
 			if (fs.existsSync(possibleVSInstallDir + vsIdeType.Pro))
 				msbuildDir = possibleVSInstallDir + vsIdeType.Pro + '\\';
 			else if (fs.existsSync(possibleVSInstallDir + vsIdeType.Enterprise + '\\'))
@@ -220,13 +220,13 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 		}
 
 		if(msbuildDir === undefined){
-			console.log('** Could not find VS IDE / tools install folder. Please install at least the VS Build Tools in the "programFiles" dir. **');
+			this.logger('** Could not find VS IDE / tools install folder. Please install at least the VS Build Tools in the "programFiles" dir. **');
 		}else {
-			console.log('VSINSTALLDIR ' + msbuildDir);
+			this.logger('VSINSTALLDIR ' + msbuildDir);
 		}
-		
+
 		exeDir = msbuildDir + 'MSBuild\\' + msBuildSubDir + '\\bin\\msbuild.exe';
-		console.log('Using msbuild.exe dir = ' + exeDir);
+		this.logger('Using msbuild.exe dir = ' + exeDir);
 	}
 
 	// If the msbuild.exe file exists, we are done.
@@ -239,7 +239,7 @@ msbuild.prototype.getMSBuildPath = function(os,processor,version){
 	frameworkDirectories = getFrameworkDirectories(msbuildDir);
 
 	if(this.toolsVersion[version] == undefined ){
-		if (frameworkDirectories.length > 0) 
+		if (frameworkDirectories.length > 0)
 			version = frameworkDirectories.pop();
 	}
 
@@ -264,17 +264,17 @@ msbuild.prototype.config =  function(name, value) {
 	if(name.toLowerCase() === 'targetframework') {
 		this.logger('\n * CONFIG WARNING: \''.concat(name,'\'  has been deprecated\n   Please use overrideParams (example: overrideParams = [\'/tv:4.0\'] )\n'));
 		return;
-	}	
-	
+	}
+
 	var map;
 
-	if (_.isPlainObject(name)) { map = name; } 
-	else if (value !== undefined) { this[name] = value; return this;	} 
-	else if (name === undefined) { return this.values; } 
+	if (_.isPlainObject(name)) { map = name; }
+	else if (value !== undefined) { this[name] = value; return this;	}
+	else if (name === undefined) { return this.values; }
 	else { return this[name]; }
 
 	for (var key in map) { this.values[name] = map[key]; }
-	
+
 	return this;
 };
 
@@ -283,7 +283,7 @@ msbuild.prototype.setConfig = function(cg){
 	this.processor =		cg.processor 		|| this.processor;
 	this.version =			cg.version 			|| this.version;
 	this.sourcePath = 		cg.sourcePath 		|| this.sourcePath;
-	this.configuration = 	cg.configuration 	|| this.configuration;  
+	this.configuration = 	cg.configuration 	|| this.configuration;
 	this.publishProfile =	cg.publishProfile 	|| this.publishProfile;
 	this.overrideParams = 	cg.overrideParams	|| this.overrideParams;
 	this.outputPath  =  	cg.outputPath		|| this.outputPath;
@@ -297,8 +297,8 @@ msbuild.prototype.abort = function (msg) {
 
 msbuild.prototype.exec = function(exe,params,cb){
 	var self = this;
-	if(self.showHelp) { self.printHelp(); return; } 
-	
+	if(self.showHelp) { self.printHelp(); return; }
+
 	function onClose(code) {
 		var msg = '';
 		if (code === 0) {
@@ -307,13 +307,13 @@ msbuild.prototype.exec = function(exe,params,cb){
 		 }
 		else {
 			msg = ('\n error code: ' + code).grey+('\n failed - errors'.white.redBG);
-			msg += '\n'+exe; 
+			msg += '\n'+exe;
 			if(params !== undefined && typeof params === 'array'){
-				params.forEach(function(p){msg += ' ' + p; }); 
+				params.forEach(function(p){msg += ' ' + p; });
 			}
 			self.emit('error',code,msg);
 			return;
-		}		
+		}
 		cb();
 	}
 
@@ -323,32 +323,32 @@ msbuild.prototype.exec = function(exe,params,cb){
 msbuild.prototype.getBuildParams = function(params){
 	if(params.indexOf('configuration') === -1 && this.configuration)
 		params.push('/p:configuration='+this.configuration);
-	
+
 	if(params.indexOf('publishprofile') === -1 && this.publishProfile)
 		params.push('/p:publishprofile=' + this.publishProfile);
-	
+
 	return params;
 }
 
 msbuild.prototype.getPackageParams = function(params){
 	if(params.indexOf('package') === -1)
-		params.push('/t:package'); 
-	
+		params.push('/t:package');
+
 	if(params.indexOf('deployonbuild') === -1)
-		params.push('/p:deployonbuild=false'); 
+		params.push('/p:deployonbuild=false');
 
 	if(params.indexOf('outputpath') === -1 && this.outputPath)
-		params.push('/p:outputpath='+this.outputPath); 
-	
+		params.push('/p:outputpath='+this.outputPath);
+
 	return params;
 }
 
 msbuild.prototype.getPublishParams = function(params){
 	if(params.indexOf('deployonbuild') === -1)
-		params.push('/p:deployonbuild=true'); 
-	
+		params.push('/p:deployonbuild=true');
+
 	if(params.indexOf('allowUntrustedCertificate') === -1)
-		params.push('/p:allowUntrustedCertificate=true'); 
+		params.push('/p:allowUntrustedCertificate=true');
 
 	return params;
 }
@@ -367,7 +367,7 @@ msbuild.prototype.getOverrideParams = function(params){
 msbuild.prototype.emitStatusStart = function(action){
 	var startingMsg = ('  '+action+' starting').cyan;
 	this.emit('status',null,startingMsg);
-}	
+}
 
 msbuild.prototype.validateSourcePath = function () {
     return fs.existsSync(this.sourcePath);
@@ -375,18 +375,18 @@ msbuild.prototype.validateSourcePath = function () {
 
 msbuild.prototype.build = function(){
 	this.emitStatusStart('build');
-	
+
 	var params = [];
 	var self = this;
 	params.push(this.sourcePath);
 	this.getBuildParams(params);
 	this.getOverrideParams(params);
-	
+
 	if(!this.validateSourcePath()){
 	    this.abort('aborting...bad source path');
 		return;
-	} 
-	
+	}
+
 	this.exec(this.buildexe(),params,function(){
 		self.logger('build done');
 	});
@@ -394,37 +394,37 @@ msbuild.prototype.build = function(){
 
 msbuild.prototype.package = function(){
 	this.emitStatusStart('package');
-	
+
 	var params = [];
 	var self = this;
 	params.push(this.sourcePath);
 	this.getBuildParams(params);
 	this.getOverrideParams(params);
 	this.getPackageParams(params);
-	
+
 	if(!this.validateSourcePath()){
 		this.abort('aborting...bad source path');
 		return;
-	} 
+	}
 
 	this.exec(this.buildexe(),params,function(){self.logger('package done');});
 }
 
 msbuild.prototype.publish = function(){
 	this.emitStatusStart('publish');
-	
+
 	var params = [];
 	var self = this;
 	params.push(this.sourcePath);
 	this.getBuildParams(params);
 	this.getOverrideParams(params);
 	this.getPublishParams(params);
-	
+
 	if(!this.validateSourcePath()){
 		this.abort('aborting...bad source path');
 		return;
-	} 
-	
+	}
+
 	this.exec(this.buildexe(),params,function(){self.logger('publish done');});
 }
 
@@ -433,7 +433,7 @@ msbuild.prototype.printHelp = function(){
 	var helpFunctionsToIgnore = ['exec','path','buildexe','on','once','emit','addListener','removeListener','removeAllListeners','listeners','setMaxListeners','printHelp'];
 	this.logger("\nfunctions".cyan.bold);
 	this.logger('*******************'.cyan);
-	
+
 	for(var p in o){
 		if(typeof(o[p]) == 'function'){
 			if(helpFunctionsToIgnore.indexOf(p) > -1) continue;
@@ -442,7 +442,7 @@ msbuild.prototype.printHelp = function(){
 			this.logger(p.redBG);
 		}
 	}
-	
+
 	this.logger("\nevents".cyan.bold + ' [err,results]'.grey);
 	this.logger('*******************'.cyan);
 	this.logger('status'.redBG+' // msbuild.on(\'status\',myfunc)'.grey);
@@ -452,19 +452,19 @@ msbuild.prototype.printHelp = function(){
 
 module.exports = function(callback){
 	var msb = new msbuild(callback);
-	msb.on('status',function(err,results){ 
-			if(this.showHelp) return; 
+	msb.on('status',function(err,results){
+			if(this.showHelp) return;
 			if(err) this.logger(err.redBG);
 			this.logger(results);
 		});
 	msb.on('error',
-		function(err,results){ 
-			this.logger('  error'.red); 
+		function(err,results){
+			this.logger('  error'.red);
 			if(err) this.logger(err.redBG);
 			this.logger(results.red);
 		});
-	msb.on('done',function(err,results){ 
-			this.logger(results); 
+	msb.on('done',function(err,results){
+			this.logger(results);
 			this.logger(lineBreak);
 			if(typeof callback == 'function') callback();
 		});
